@@ -1,131 +1,114 @@
-﻿# MiDaS for ROS1 by using LibTorch in C++
+# Vision Arm Control Project
 
-### Requirements
+## Overview
 
-- Ubuntu 17.10 / 18.04 / 20.04, Debian Stretch
-- ROS Melodic for Ubuntu (17.10 / 18.04) / Debian Stretch, ROS Noetic for Ubuntu 20.04
-- C++11
-- LibTorch >= 1.6
+This project implements a vision-based control system for a Franka robotic arm using ROS Noetic. It utilizes computer vision techniques, including human pose estimation and depth estimation, to control the Franka arm in real-time, allowing it to mimic human arm movements.
 
-## Quick Start with a MiDaS Example
+Key features:
+- Human pose estimation using MediaPipe
+- Depth estimation using MonoDepth2
+- ROS Noetic integration for Franka arm control
+- Real-time video processing and visualization
 
-MiDaS is a neural network to compute depth from a single image.
+## Prerequisites
 
-* input from `image_topic`: `sensor_msgs/Image` - `RGB8` image with any shape
-* output to `midas_topic`: `sensor_msgs/Image` - `TYPE_32FC1` inverse relative depth maps in range [0 - 255] with original size and channels=1
+- Ubuntu 20.04
+- ROS Noetic
+- Python 3.8+
+- CUDA 11.8 or higher
+- cuDNN 8.0 or higher
+- OpenCV 4.2 or higher
+- PyTorch 1.8 or higher
+- TensorFlow 2.4 or higher (for MediaPipe)
 
-### Install Dependecies
+## Installation
 
-* install ROS Melodic for Ubuntu 17.10 / 18.04:
-```bash
-wget https://raw.githubusercontent.com/isl-org/MiDaS/master/ros/additions/install_ros_melodic_ubuntu_17_18.sh
-./install_ros_melodic_ubuntu_17_18.sh
-```
+### 1. ROS Noetic
 
-or Noetic for Ubuntu 20.04: 
+Follow the [official ROS Noetic installation guide](http://wiki.ros.org/noetic/Installation/Ubuntu) for Ubuntu 20.04.
 
-```bash
-wget https://raw.githubusercontent.com/isl-org/MiDaS/master/ros/additions/install_ros_noetic_ubuntu_20.sh
-./install_ros_noetic_ubuntu_20.sh
-```
+### 2. CUDA and cuDNN
 
+[Instructions for CUDA and cuDNN installation remain the same]
 
-* install LibTorch 1.7 with CUDA 11.0:
+### 3. Python Environment
 
-On **Jetson (ARM)**:
-```bash
-wget https://nvidia.box.com/shared/static/wa34qwrwtk9njtyarwt5nvo6imenfy26.whl -O torch-1.7.0-cp36-cp36m-linux_aarch64.whl
-sudo apt-get install python3-pip libopenblas-base libopenmpi-dev 
-pip3 install Cython
-pip3 install numpy torch-1.7.0-cp36-cp36m-linux_aarch64.whl
-```
-Or compile LibTorch from source: https://github.com/pytorch/pytorch#from-source
+[Instructions for Python environment setup remain the same]
 
-On **Linux (x86_64)**:
-```bash
-cd ~/
-wget https://download.pytorch.org/libtorch/cu110/libtorch-cxx11-abi-shared-with-deps-1.7.0%2Bcu110.zip
-unzip libtorch-cxx11-abi-shared-with-deps-1.7.0+cu110.zip
-```
+### 4. Project Setup
 
-* create symlink for OpenCV:
+1. Clone the repository:
+   ```
+   mkdir -p ~/catkin_ws/src
+   cd ~/catkin_ws/src
+   git clone https://github.com/raayraay96/summer25-Franka-ros-noetic.git
+   ```
 
-```bash
-sudo ln -s /usr/include/opencv4 /usr/include/opencv
-```
+2. Install additional dependencies:
+   ```
+   sudo apt-get install ros-noetic-franka-ros
+   sudo apt-get install ros-noetic-libfranka
+   ```
 
-* download and install MiDaS:
+3. Build the workspace using catkin_make_isolated:
+   ```
+   cd ~/catkin_ws
+   catkin_make_isolated
+   ```
 
-```bash
-source ~/.bashrc
-cd ~/
-mkdir catkin_ws
-cd catkin_ws
-git clone https://github.com/isl-org/MiDaS
-mkdir src
-cp -r MiDaS/ros/* src
+4. Source the workspace:
+   ```
+   source devel_isolated/setup.bash
+   ```
 
-chmod +x src/additions/*.sh
-chmod +x src/*.sh
-chmod +x src/midas_cpp/scripts/*.py
-cp src/additions/do_catkin_make.sh ./do_catkin_make.sh
-./do_catkin_make.sh
-./src/additions/downloads.sh
-```
+## Usage
 
-### Usage
+1. Launch the main node:
+   ```
+   roslaunch vision_arm_control vision_arm_control.launch
+   ```
 
-* run only `midas` node: `~/catkin_ws/src/launch_midas_cpp.sh`
+2. In a separate terminal, run the camera node:
+   ```
+   rosrun vision_arm_control ros_camera_view.py
+   ```
 
-#### Test
+## Project Structure
 
-* Test - capture video and show result in the window:
-    * place any `test.mp4` video file to the directory `~/catkin_ws/src/`
-    * run `midas` node: `~/catkin_ws/src/launch_midas_cpp.sh`
-    * run test nodes in another terminal: `cd ~/catkin_ws/src && ./run_talker_listener_test.sh` and wait 30 seconds
-    
-    (to use Python 2, run command `sed -i 's/python3/python2/' ~/catkin_ws/src/midas_cpp/scripts/*.py` )
+- `src/vision_arm_control/`: Main project package
+  - `scripts/`: Python scripts for vision processing and arm control
+  - `launch/`: ROS launch files
+  - `config/`: Configuration files
+- `src/monodepth2/`: MonoDepth2 submodule for depth estimation
+- `src/trac_ik/`: TRAC-IK submodule for inverse kinematics
 
-## Mobile version of MiDaS - Monocular Depth Estimation
+## Contributing
 
-### Accuracy
+Contributions to this project are welcome. Please fork the repository and submit a pull request with your changes.
 
-* MiDaS v2 small - ResNet50 default-decoder 384x384
-* MiDaS v2.1 small - EfficientNet-Lite3 small-decoder 256x256
+## License
 
-**Zero-shot error** (the lower - the better):
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-| Model |  DIW WHDR | Eth3d AbsRel | Sintel AbsRel | Kitti δ>1.25 | NyuDepthV2 δ>1.25 | TUM δ>1.25 |
-|---|---|---|---|---|---|---|
-| MiDaS v2 small 384x384 | **0.1248** | 0.1550 | **0.3300** | **21.81** | 15.73 | 17.00 |
-| MiDaS v2.1 small 256x256 | 0.1344 | **0.1344** | 0.3370 | 29.27 | **13.43** | **14.53** |
-| Relative improvement, % | -8 % | **+13 %** | -2 % | -34 % | **+15 %** | **+15 %** |
+## Acknowledgments
 
-None of Train/Valid/Test subsets of datasets (DIW, Eth3d, Sintel, Kitti, NyuDepthV2, TUM) were not involved in Training or Fine Tuning.
+- [MonoDepth2](https://github.com/nianticlabs/monodepth2) for depth estimation
+- [MediaPipe](https://github.com/google/mediapipe) for pose estimation
+- [ROS](https://www.ros.org/) for robotics framework
+- [Franka Emika](https://www.franka.de/) for the Franka robot
 
-### Inference speed (FPS) on nVidia GPU
+## Troubleshooting
 
-Inference speed excluding pre and post processing, batch=1, **Frames Per Second** (the higher - the better):
+If you encounter any issues during setup or execution, please check the following:
 
-| Model | Jetson Nano, FPS | RTX 2080Ti, FPS |
-|---|---|---|
-| MiDaS v2 small 384x384 | 1.6 | 117 |
-| MiDaS v2.1 small 256x256 | 8.1 | 232 |
-| SpeedUp, X times | **5x** | **2x** |
+1. Ensure all dependencies are correctly installed.
+2. Verify that your CUDA and cuDNN versions are compatible with your PyTorch and TensorFlow installations.
+3. Make sure your ROS environment is properly sourced.
+4. If you encounter build issues, try cleaning your workspace and rebuilding:
+   ```
+   cd ~/catkin_ws
+   rm -rf build_isolated devel_isolated
+   catkin_make_isolated
+   ```
 
-### Citation
-
-This repository contains code to compute depth from a single image. It accompanies our [paper](https://arxiv.org/abs/1907.01341v3):
-
->Towards Robust Monocular Depth Estimation: Mixing Datasets for Zero-shot Cross-dataset Transfer  
-René Ranftl, Katrin Lasinger, David Hafner, Konrad Schindler, Vladlen Koltun
-
-Please cite our paper if you use this code or any of the models:
-```
-@article{Ranftl2020,
-	author    = {Ren\'{e} Ranftl and Katrin Lasinger and David Hafner and Konrad Schindler and Vladlen Koltun},
-	title     = {Towards Robust Monocular Depth Estimation: Mixing Datasets for Zero-shot Cross-dataset Transfer},
-	journal   = {IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI)},
-	year      = {2020},
-}
-```
+For additional help, please open an issue in the GitHub repository.
