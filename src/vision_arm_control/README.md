@@ -112,3 +112,11 @@ If you encounter any issues during setup or execution, please check the followin
    ```
 
 For additional help, please open an issue in the GitHub repository.
+
+
+
+![Screenshot from 2024-08-18 19-59-52](https://github.com/user-attachments/assets/b5c32aea-6236-45f5-b62f-182bf95e7df9)
+
+![Screenshot from 2024-08-18 19-57-36](https://github.com/user-attachments/assets/ddf8d767-7f2e-402e-ac0e-d0cc13ebf851)
+
+
