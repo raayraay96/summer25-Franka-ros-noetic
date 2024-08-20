@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>vision_arm_control</name>
+  <version>0.0.0</version>
+  <description>The vision_arm_control package</description>
+  <maintainer email="your_email@example.com">Your Name</maintainer>
+  <license>TODO</license>
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>rospy</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>franka_gazebo</depend>
+  <depend>panda_moveit_config</depend>
+  <depend>usb_cam</depend>
+  <depend>cv_bridge</depend>
+  <depend>image_transport</depend>
+  <exec_depend>python-numpy</exec_depend>
+  <exec_depend>python-opencv</exec_depend>
+  <exec_depend>python-mediapipe</exec_depend>
+  <exec_depend>python-ikpy</exec_depend>
+</package>

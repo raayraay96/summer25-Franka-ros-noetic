@@ -1,0 +1,10 @@
+<launch>
+  <env name="PYTHONPATH" value="$(env PYTHONPATH):$(find vision_arm_control)/../:$(find vision_arm_control)/../monodepth2" />
+  
+  <node name="camera_node" pkg="vision_arm_control" type="ros_camera_view.py" output="screen">
+  </node>
+  
+  <node name="vision_arm_control_node" pkg="vision_arm_control" type="main.py" output="screen">
+    <param name="monodepth2_weights_path" value="$(find vision_arm_control)/weights/monodepth2_weights.pth" />
+  </node>
+</launch>
