@@ -81,5 +81,8 @@ Makefile
 
 # Ignore potential macOS specific files
 .DS_Store
-
+# Ignore nested repositories
+/libfranka/
+/opencv/
+/opencv_contrib/
 # Add any other project-specific files or directories you want to ignore
