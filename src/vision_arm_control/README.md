@@ -113,7 +113,7 @@ If you encounter any issues during setup or execution, please check the followin
 
 For additional help, please open an issue in the GitHub repository.
 
-
+Below is the images of my Depth Map. I was able to figure this out on my last day working on it but didnt really get to much due to the lighting in the room.
 
 ![Screenshot from 2024-08-18 19-59-52](https://github.com/user-attachments/assets/b5c32aea-6236-45f5-b62f-182bf95e7df9)
 
