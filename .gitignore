@@ -86,9 +86,8 @@ Makefile
 /opencv/
 /opencv_contrib/
 
-echo "/src/monodepth2/" >> .gitignore
-echo "/src/trac_ik/" >> .gitignore
-git add .gitignore
-git commit -m "Ignore submodule changes"
+
 # Add any other project-specific files or directories you want to ignore/src/monodepth2/
+/src/trac_ik/
+/src/monodepth2/
 /src/trac_ik/
