@@ -1,0 +1,85 @@
+# ROS specific
+build/
+build_isolated/
+devel/
+devel_isolated/
+install_isolated/
+logs/
+.catkin_workspace
+
+# Bag files
+*.bag
+
+# Compiled Python files
+*.pyc
+
+# Python cache
+__pycache__/
+
+# Temporary files
+*.swp
+*~
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# Eclipse
+.project
+.cproject
+.settings/
+
+# Custom directories
+Building/
+Processing/
+
+# Specific files
+Miniconda3-latest-Linux-x86_64.sh
+
+# OpenCV build
+opencv/build/
+
+# libfranka build
+libfranka/build/
+
+# Ignore all files in kitti_data
+kitti_data/*
+
+# Keep specific directories if needed
+# !kitti_data/important_subdirectory/
+
+# Ignore potential Python virtual environments
+venv/
+env/
+*.venv
+.env
+
+# Ignore potential Node.js dependencies
+node_modules/
+
+# Ignore potential CMake files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Ignore potential ROS generated files
+*.msg
+*.srv
+*Action.msg
+*ActionFeedback.msg
+*ActionGoal.msg
+*ActionResult.msg
+*~
+
+# Ignore potential C++ compiled files
+*.o
+*.so
+*.dylib
+
+# Ignore potential macOS specific files
+.DS_Store
+
+# Add any other project-specific files or directories you want to ignore
