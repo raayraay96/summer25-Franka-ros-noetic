@@ -71,8 +71,8 @@ class VisionArmControl:
             self.arm_controller.move_arm(target_pose)
 
         depth_map = self.estimate_depth(cv_image)
-        self.publish_depth(depth_map)
-
+        self.publish_depth(depth_map) #this is causing my error. Not sure why its saying something about not havind an encoder
+        # i downloaded the kiti 
         # Display the image and depth map
         cv2.imshow("Camera Feed", cv_image)
         cv2.imshow("Depth Map", depth_map)
