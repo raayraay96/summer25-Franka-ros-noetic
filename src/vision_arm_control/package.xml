@@ -19,4 +19,6 @@
   <exec_depend>python-opencv</exec_depend>
   <exec_depend>python-mediapipe</exec_depend>
   <exec_depend>python-ikpy</exec_depend>
+
+  
 </package>

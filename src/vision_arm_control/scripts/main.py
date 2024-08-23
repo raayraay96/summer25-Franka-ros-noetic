@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import sys
 import os
 import rospy
@@ -8,115 +7,17 @@ import cv2
 import numpy as np
 import mediapipe as mp
 from cv_bridge import CvBridge, CvBridgeError
-from sensor_msgs.msg import Image, JointState
+from sensor_msgs.msg import Image, JointState, CompressedImage
 from geometry_msgs.msg import PoseStamped
 from ikpy.chain import Chain
 from ikpy.link import OriginLink, URDFLink
+from tf.transformations import quaternion_from_euler
 
-# Append the monodepth2 path
-sys.path.append(os.path.expanduser('~/catkin_ws/src/monodepth2'))
+# Append the monodepth2 path 
+sys.path.append(os.path.expanduser('~/catkin_ws/src/monodepth2')) 
 
 # Import monodepth2 modules
-from monodepth2.networks.resnet_encoder import ResnetEncoder
-from monodepth2.networks.depth_decoder import DepthDecoder
-
-class VisionArmControl:
-    def __init__(self):
-        rospy.init_node('vision_arm_control', anonymous=True)
-        
-        self.is_running = True
-        self.bridge = CvBridge()
-        self.image_sub = rospy.Subscriber("/camera/image_raw", Image, self.image_callback, queue_size=1)
-        self.depth_pub = rospy.Publisher("/monodepth2/depth", Image, queue_size=1)
-        
-        self.pose_estimator = mp.solutions.pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
-        self.arm_controller = PandaArmController()
-
-        # Initialize Monodepth2 model
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.encoder = ResnetEncoder(18, False).to(self.device)
-        self.depth_decoder = DepthDecoder(num_ch_enc=self.encoder.num_ch_enc, scales=range(4)).to(self.device)
-
-        weights_path = rospy.get_param('~monodepth2_weights_path', '')
-        if weights_path:
-            self.load_weights(weights_path)
-        
-        rospy.on_shutdown(self.shutdown_hook)
-
-    def load_weights(self, weights_path):
-        try:
-            loaded_dict = torch.load(weights_path, map_location=self.device)
-            encoder_dict = {k: v for k, v in loaded_dict.items() if k.startswith('encoder')}
-            decoder_dict = {k: v for k, v in loaded_dict.items() if k.startswith('depth')}
-            
-            self.encoder.load_state_dict(encoder_dict)
-            self.depth_decoder.load_state_dict(decoder_dict)
-            
-            rospy.loginfo("Model weights loaded successfully")
-        except Exception as e:
-            rospy.logerr(f"Failed to load model weights: {e}")
-
-    def image_callback(self, data):
-        if not self.is_running:
-            return
-        try:
-            cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
-        except CvBridgeError as e:
-            rospy.logerr(f"CvBridge Error: {e}")
-            return
-
-        landmarks = self.estimate_pose(cv_image)
-        if landmarks:
-            target_pose = self.map_human_pose_to_robot(landmarks)
-            self.arm_controller.move_arm(target_pose)
-
-        depth_map = self.estimate_depth(cv_image)
-        self.publish_depth(depth_map) #this is causing my error. Not sure why its saying something about not havind an encoder
-        # i downloaded the kiti 
-        # Display the image and depth map
-        cv2.imshow("Camera Feed", cv_image)
-        cv2.imshow("Depth Map", depth_map)
-        cv2.waitKey(1)
-
-    def estimate_pose(self, frame):
-        results = self.pose_estimator.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-        return results.pose_landmarks.landmark if results.pose_landmarks else None
-
-    def map_human_pose_to_robot(self, landmarks):
-        # Implement your mapping logic here
-        # This is a placeholder implementation
-        target_pose = PoseStamped()
-        # Set target_pose based on landmarks
-        return target_pose
-
-    def estimate_depth(self, image):
-        with torch.no_grad():
-            input_image = self.preprocess(image)
-            features = self.encoder(input_image)
-            outputs = self.depth_decoder(features)
-            disp = outputs[("disp", 0)]
-            return disp.squeeze().cpu().numpy()
-
-    def preprocess(self, img):
-        img = cv2.resize(img, (640, 192))
-        img = img.astype(np.float32) / 255.0
-        img = img.transpose(2, 0, 1)
-        return torch.from_numpy(img).unsqueeze(0).to(self.device)
-
-    def publish_depth(self, depth_map):
-        try:
-            depth_msg = self.bridge.cv2_to_imgmsg((depth_map * 255).astype(np.uint8), "mono8")
-            self.depth_pub.publish(depth_msg)
-        except CvBridgeError as e:
-            rospy.logerr(f"Error publishing depth map: {e}")
-
-    def shutdown_hook(self):
-        rospy.loginfo("Shutting down...")
-        self.is_running = False
-        cv2.destroyAllWindows()
-
-    def run(self):
-        rospy.spin()
+from monodepth2.networks import ResnetEncoder, DepthDecoder
 
 class PandaArmController:
     def __init__(self):
@@ -124,38 +25,168 @@ class PandaArmController:
         self.panda_chain = self.setup_ikpy_chain()
 
     def setup_ikpy_chain(self):
-        # This is a simplified chain. You'll need to adjust these values based on your actual robot.
         return Chain(name='panda', links=[
             OriginLink(),
-            URDFLink(
-                name="panda_link1",
-                origin_translation=[0, 0, 0.333],
-                origin_orientation=[0, 0, 0],
-                rotation=[0, 0, 1],
-            ),
-            URDFLink(
-                name="panda_link2",
-                origin_translation=[0, 0, 0],
-                origin_orientation=[0, 0, 0],
-                rotation=[0, 1, 0],
-            ),
-            # Add more links as needed
+            URDFLink(name="panda_link1", origin_translation=[0, 0, 0.333], origin_orientation=[0, 0, 0], rotation=[0, 0, 1]),
+            URDFLink(name="panda_link2", origin_translation=[0, 0, 0], origin_orientation=[0, 0, 0], rotation=[0, 1, 0]),
+            # ... add other links
         ])
 
     def move_arm(self, target_pose):
-        # Convert PoseStamped to a 4x4 transformation matrix
-        target_matrix = np.eye(4)
-        target_matrix[:3, 3] = [target_pose.pose.position.x, target_pose.pose.position.y, target_pose.pose.position.z]
-        # You'll need to convert the quaternion to a rotation matrix here
+        target_frame = np.eye(4)
+        target_frame[:3, 3] = [target_pose.pose.position.x, target_pose.pose.position.y, target_pose.pose.position.z]
+        # ... populate target_frame with orientation from target_pose
+        
+        try:
+            ik_solution = self.panda_chain.inverse_kinematics_frame(target_frame)
+            joint_state = JointState()
+            joint_state.position = ik_solution[1:]  # Exclude the base rotation
+            self.joint_pub.publish(joint_state)
+            rospy.loginfo(f"Moving arm to: {target_pose}")
+        except Exception as e:
+            rospy.logwarn(f"IK solution failed or arm movement error: {e}")
 
-        # Compute IK
-        ik_solution = self.panda_chain.inverse_kinematics_frame(target_matrix)
+class VisionArmControl:
+    def __init__(self):
+        rospy.init_node('vision_arm_control', anonymous=True)
+        self.bridge = CvBridge()
+        self.image_sub = rospy.Subscriber("/camera/color/image_raw/compressed", CompressedImage, self.image_callback, queue_size=1, buff_size=2**24) 
+        self.depth_pub = rospy.Publisher("/monodepth2/depth", Image, queue_size=1)
+        
+        # Initialize pose estimator
+        self.mp_pose = mp.solutions.pose
+        self.pose_estimator = self.mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
+        
+        # Initialize other components (encoder, depth_decoder, etc.)
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.encoder = ResnetEncoder(18, False)
+        self.depth_decoder = DepthDecoder(self.encoder.num_ch_enc, scales=range(4))
+        
+        # Load pre-trained weights if available
+        encoder_path = rospy.get_param('~encoder_weights_path', '')
+        depth_decoder_path = rospy.get_param('~depth_weights_path', '')
 
-        # Publish joint commands
-        joint_state = JointState()
-        joint_state.position = ik_solution[1:]  # Exclude the base rotation
-        self.joint_pub.publish(joint_state)
+        try:
+            if encoder_path and os.path.exists(encoder_path):
+                state_dict = torch.load(encoder_path, map_location=self.device)
+                # Filter out unexpected keys
+                filtered_dict = {k: v for k, v in state_dict.items() if k in self.encoder.state_dict()}
+                self.encoder.load_state_dict(filtered_dict, strict=False)
+                rospy.loginfo(f"Loaded encoder weights from {encoder_path}")
+            else:
+                rospy.logwarn(f"Encoder weights not found at {encoder_path}")
+
+            if depth_decoder_path and os.path.exists(depth_decoder_path):
+                self.depth_decoder.load_state_dict(torch.load(depth_decoder_path, map_location=self.device))
+                rospy.loginfo(f"Loaded depth decoder weights from {depth_decoder_path}")
+            else:
+                rospy.logwarn(f"Depth decoder weights not found at {depth_decoder_path}")
+        except Exception as e:
+            rospy.logerr(f"Error loading weights: {e}")
+
+        self.encoder.to(self.device).eval()
+        self.depth_decoder.to(self.device).eval()
+
+        self.arm_controller = PandaArmController()
+        
+        rospy.loginfo("VisionArmControl initialized successfully")
+
+    def image_callback(self, data):
+        try:
+            cv_image = self.bridge.compressed_imgmsg_to_cv2(data, "bgr8")
+            rospy.loginfo(f"Received image. Shape: {cv_image.shape}")
+        except CvBridgeError as e:
+            rospy.logerr(f"CvBridge Error: {e}")
+            return
+
+        landmarks = self.estimate_pose(cv_image)
+        if landmarks:
+            rospy.loginfo("Pose landmarks detected")
+            target_pose = self.map_human_pose_to_robot(landmarks)
+            if target_pose:
+                self.arm_controller.move_arm(target_pose)
+
+        depth_map = self.estimate_depth(cv_image)
+        if depth_map is not None:
+            rospy.loginfo(f"Depth map generated. Shape: {depth_map.shape}")
+            self.publish_depth(depth_map)
+            cv2.imshow('Depth Map', depth_map)
+        else:
+            rospy.logwarn("Failed to generate depth map")
+
+        cv2.imshow('Original', cv_image)
+        cv2.waitKey(1)
+
+    def estimate_pose(self, frame):
+        results = self.pose_estimator.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+        if results.pose_landmarks:
+            rospy.loginfo("Pose landmarks detected")
+        else:
+            rospy.loginfo("No pose landmarks detected")
+        return results.pose_landmarks.landmark if results.pose_landmarks else None
+
+    def map_human_pose_to_robot(self, landmarks):
+        try:
+            target_pose = PoseStamped()
+            target_pose.header.frame_id = "base_link"  
+            target_pose.pose.position.x = landmarks[self.mp_pose.PoseLandmark.RIGHT_WRIST.value].x
+            target_pose.pose.position.y = landmarks[self.mp_pose.PoseLandmark.RIGHT_WRIST.value].y
+            target_pose.pose.position.z = landmarks[self.mp_pose.PoseLandmark.RIGHT_WRIST.value].z
+
+            # Example: Set orientation 
+            roll, pitch, yaw = 0.0, 0.0, 0.0
+            target_pose.pose.orientation.x, target_pose.pose.orientation.y, target_pose.pose.orientation.z, target_pose.pose.orientation.w = quaternion_from_euler(roll, pitch, yaw)
+
+            return target_pose
+        except Exception as e:
+            rospy.logwarn(f"Error mapping human pose: {e}")
+            return None 
+
+    def estimate_depth(self, image):
+        rospy.loginfo("Starting depth estimation")
+        try:
+            with torch.no_grad():
+                input_tensor = self.preprocess(image)
+                features = self.encoder(input_tensor)
+                outputs = self.depth_decoder(features)
+                disp = outputs[("disp", 0)]
+                
+                disp_resized = torch.nn.functional.interpolate(
+                    disp, (image.shape[0], image.shape[1]), mode="bilinear", align_corners=False
+                )
+                depth_map = 1 / disp_resized.squeeze().cpu().numpy()
+                return depth_map
+        except Exception as e:
+            rospy.logerr(f"Error in depth estimation: {e}")
+            return None
+
+    def preprocess(self, img):
+        img = cv2.resize(img, (640, 192))
+        img = img.astype(np.float32) / 255.0
+        img = img.transpose(2, 0, 1)
+        input_tensor = torch.from_numpy(img).unsqueeze(0).to(self.device)
+        return input_tensor
+
+    def publish_depth(self, depth_map):
+        depth_map_normalized = cv2.normalize(depth_map, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
+        depth_map_color = cv2.applyColorMap(depth_map_normalized, cv2.COLORMAP_JET)
+
+        try:
+            depth_msg = self.bridge.cv2_to_imgmsg(depth_map_color, "bgr8") 
+            self.depth_pub.publish(depth_msg)
+            rospy.loginfo("Depth map published successfully") 
+        except CvBridgeError as e:
+            rospy.logerr(f"Error publishing depth map: {e}")
+
+    def shutdown_hook(self):
+        cv2.destroyAllWindows()
+
+    def run(self):
+        rospy.spin()
 
 if __name__ == '__main__':
-    vision_arm_control = VisionArmControl()
-    vision_arm_control.run()
+    try:
+        vision_arm_control = VisionArmControl()
+        vision_arm_control.run()
+    except rospy.ROSInterruptException:
+        pass

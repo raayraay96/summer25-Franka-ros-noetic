@@ -2,37 +2,35 @@
 import rospy
 import cv2
 import numpy as np
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import CompressedImage
 
 class CameraNode:
     def __init__(self):
         rospy.init_node('camera_node', anonymous=True)
-        self.image_pub = rospy.Publisher("/camera/image_raw", Image, queue_size=10)
+        self.image_pub = rospy.Publisher("/camera/color/image_raw/compressed", CompressedImage, queue_size=10)
         self.cap = cv2.VideoCapture(0)
+        rospy.loginfo("Camera node initialized")
 
     def run(self):
+        rate = rospy.Rate(10)  # 10Hz
         while not rospy.is_shutdown():
             ret, frame = self.cap.read()
             if ret:
-                cv2.imshow('ROS Camera', frame)
+                rospy.loginfo("Camera captured a frame")
                 try:
-                    img_msg = Image()
-                    img_msg.height = frame.shape[0]
-                    img_msg.width = frame.shape[1]
-                    img_msg.encoding = "bgr8"
-                    img_msg.is_bigendian = False
-                    img_msg.step = 3 * frame.shape[1]
-                    img_msg.data = np.array(frame).tobytes()
-                    self.image_pub.publish(img_msg)
+                    msg = CompressedImage()
+                    msg.header.stamp = rospy.Time.now()
+                    msg.format = "jpeg"
+                    msg.data = np.array(cv2.imencode('.jpg', frame)[1]).tostring()
+                    self.image_pub.publish(msg)
+                    rospy.loginfo("Published compressed image")
                 except Exception as e:
-                    print(e)
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    break
+                    rospy.logerr(f"Error publishing image: {e}")
             else:
-                rospy.loginfo("Failed to capture frame")
+                rospy.logwarn("Failed to capture frame")
+            rate.sleep()
         
         self.cap.release()
-        cv2.destroyAllWindows()
 
 if __name__ == '__main__':
     try:

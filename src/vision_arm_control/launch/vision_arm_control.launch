@@ -5,6 +5,7 @@
   </node>
   
   <node name="vision_arm_control_node" pkg="vision_arm_control" type="main.py" output="screen">
-    <param name="monodepth2_weights_path" value="$(find vision_arm_control)/weights/monodepth2_weights.pth" />
+    <param name="encoder_weights_path" value="/home/edr/catkin_ws/src/vision_arm_control/weights/encoder.pth" />
+    <param name="depth_weights_path" value="/home/edr/catkin_ws/src/vision_arm_control/weights/depth.pth" />
   </node>
 </launch>
