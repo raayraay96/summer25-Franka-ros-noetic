@@ -1,0 +1,19 @@
+# Python dependencies for vision_arm_control (ROS Noetic / Ubuntu 20.04 recommended)
+# Install system ROS packages separately (ros-noetic-*).
+
+numpy>=1.19,<2.0
+opencv-python-headless>=4.5
+PyYAML>=5.4
+pytest>=7.0
+
+# Perception (optional for unit tests of pure mapping modules)
+# mediapipe pins vary by Python version; on py3.8 prefer mediapipe==0.10.9
+mediapipe>=0.10.0; python_version < "3.13"
+
+# Deep learning for MonoDepth2 (install matching CUDA wheel for your GPU)
+# torch and torchvision are environment-specific — pin in environment.yml when possible.
+# torch>=1.8
+# torchvision>=0.9
+
+# Used by legacy IK experiments (not primary MoveIt path)
+# ikpy>=3.3

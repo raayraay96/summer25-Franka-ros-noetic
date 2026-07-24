@@ -1,0 +1,15 @@
+name: vision_arm_control
+channels:
+  - conda-forge
+  - pytorch
+dependencies:
+  - python=3.8
+  - numpy=1.23
+  - pyyaml
+  - pytest
+  - pip
+  - pip:
+      - opencv-python-headless>=4.5
+      - mediapipe==0.10.9
+      # Install torch appropriate for your CUDA/CPU:
+      # pip install torch==1.13.1+cu117 -f https://download.pytorch.org/whl/torch_stable.html
