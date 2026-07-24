@@ -1,0 +1,23 @@
+# Model artifact configuration
+#
+# Weights are NOT stored in Git. Resolve via:
+#   export FRANKA_MODEL_DIR=/path/to/models
+# or on Purdue Scholar:
+#   export FRANKA_MODEL_DIR=$RCAC_SCRATCH/franka-teleop-data/models
+#
+# See docs/model-setup.md and scripts/download_models.sh
+
+models:
+  root_env: "FRANKA_MODEL_DIR"
+  encoder: "encoder.pth"
+  depth: "depth.pth"
+  pose_encoder: "pose_encoder.pth"
+  pose: "pose.pth"
+  # Official MonoDepth2 pretrained models are obtained via Niantic scripts.
+  # Local research weights from HUMANS MOVE must be copied manually.
+  expected_files:
+    - encoder.pth
+    - depth.pth
+  notes:
+    monodepth2_output: "relative disparity/depth — not metric meters"
+    license: "See MonoDepth2 LICENSE / Niantic research terms"

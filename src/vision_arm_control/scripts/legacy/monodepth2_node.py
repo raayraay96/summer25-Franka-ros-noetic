@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""LEGACY depth node retained for research history. Prefer depth_estimator_node.py."""
 import sys
 import os
 import rospy
@@ -29,7 +30,11 @@ class Monodepth2Node:
         self.depth_decoder = DepthDecoder(num_ch_enc=self.encoder.num_ch_enc, scales=range(4)).to(self.device)
 
         # Load model weights
-        weights_path = rospy.get_param('~weights_path', '/home/edr/catkin_ws/src/vision_arm_control/weights/monodepth2_weights.pth')
+        # Legacy node: prefer FRANKA_MODEL_DIR / ROS param; no machine-specific defaults.
+        weights_path = rospy.get_param(
+            '~weights_path',
+            os.path.expandvars('${FRANKA_MODEL_DIR}/depth.pth'),
+        )
         try:
             loaded_dict = torch.load(weights_path, map_location=self.device)
             self.encoder.load_state_dict({k: v for k, v in loaded_dict.items() if k.startswith('encoder')})

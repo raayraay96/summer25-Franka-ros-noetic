@@ -1,0 +1,23 @@
+# Motion / controller configuration
+#
+# Default mode is dry_run: targets are published for inspection only.
+# Real hardware requires explicit use_robot:=true and safety.allow_real_robot.
+
+controller:
+  mode: "dry_run"  # dry_run | simulation | real_robot
+  use_robot: false
+  use_moveit: true
+  move_group: "panda_arm"
+  end_effector_link: "panda_link8"
+  planning_frame: "panda_link0"
+  planning_time: 1.0
+  max_velocity_scaling: 0.2
+  max_acceleration_scaling: 0.2
+  goal_position_tolerance: 0.01
+  goal_orientation_tolerance: 0.1
+  # Orientation: for position teleop we hold a fixed tool orientation
+  fixed_orientation_rpy: [3.14159, 0.0, 0.0]
+  # Topic used in dry_run / mock mode
+  target_pose_topic: "/teleop/target_pose"
+  command_pose_topic: "/teleop/command_pose"
+  status_topic: "/teleop/status"

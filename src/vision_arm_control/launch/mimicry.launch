@@ -1,0 +1,69 @@
+<launch>
+  <!--
+    Full teleoperation pipeline.
+    Real robot motion is DISABLED by default.
+    Enable only with: use_robot:=true  AND  safety.allow_real_robot true in config.
+  -->
+  <arg name="use_robot" default="false"/>
+  <arg name="use_camera" default="true"/>
+  <arg name="use_mock_landmarks" default="false"/>
+  <arg name="enable_depth" default="false"/>
+  <arg name="headless" default="true"/>
+  <arg name="control_mode" default="dry_run"/>
+  <arg name="model_dir" default=""/>
+  <arg name="image_topic" default="/camera/color/image_raw/compressed"/>
+
+  <rosparam file="$(find vision_arm_control)/config/camera.yaml" command="load"/>
+  <rosparam file="$(find vision_arm_control)/config/perception.yaml" command="load"/>
+  <rosparam file="$(find vision_arm_control)/config/mapping.yaml" command="load"/>
+  <rosparam file="$(find vision_arm_control)/config/safety.yaml" command="load"/>
+  <rosparam file="$(find vision_arm_control)/config/controller.yaml" command="load"/>
+  <rosparam file="$(find vision_arm_control)/config/camera_intrinsics.yaml" command="load"/>
+  <rosparam file="$(find vision_arm_control)/config/models.yaml" command="load"/>
+
+  <!-- Force dry_run unless use_robot is explicitly true -->
+  <param name="/teleop/use_robot" value="$(arg use_robot)"/>
+
+  <group if="$(arg use_camera)">
+    <node pkg="vision_arm_control" type="camera_node.py" name="camera_node" output="screen" unless="$(arg use_mock_landmarks)">
+      <param name="image_topic" value="$(arg image_topic)"/>
+    </node>
+  </group>
+
+  <node pkg="vision_arm_control" type="mock_landmark_publisher.py" name="mock_landmark_publisher" output="screen" if="$(arg use_mock_landmarks)"/>
+
+  <node pkg="vision_arm_control" type="pose_estimator_node.py" name="pose_estimator_node" output="screen" unless="$(arg use_mock_landmarks)">
+    <param name="image_topic" value="$(arg image_topic)"/>
+    <param name="headless" value="$(arg headless)"/>
+  </node>
+
+  <node pkg="vision_arm_control" type="depth_estimator_node.py" name="depth_estimator_node" output="screen" if="$(arg enable_depth)">
+    <param name="image_topic" value="$(arg image_topic)"/>
+    <param name="model_dir" value="$(arg model_dir)"/>
+    <param name="headless" value="$(arg headless)"/>
+  </node>
+
+  <node pkg="vision_arm_control" type="human_to_robot_mapper_node.py" name="human_to_robot_mapper_node" output="screen">
+    <param name="mapping_mode" value="shoulder_relative"/>
+    <rosparam param="workspace" subst_value="true">
+      x_min: 0.25
+      x_max: 0.75
+      y_min: -0.40
+      y_max: 0.40
+      z_min: 0.05
+      z_max: 0.80
+    </rosparam>
+  </node>
+
+  <node pkg="vision_arm_control" type="safety_monitor_node.py" name="safety_monitor_node" output="screen">
+    <param name="control_mode" value="$(arg control_mode)"/>
+    <param name="allow_real_robot" value="$(arg use_robot)"/>
+    <param name="require_deadman" value="true"/>
+  </node>
+
+  <node pkg="vision_arm_control" type="robot_controller_node.py" name="robot_controller_node" output="screen">
+    <param name="mode" value="$(arg control_mode)"/>
+    <param name="use_robot" value="$(arg use_robot)"/>
+    <param name="allow_real_robot" value="$(arg use_robot)"/>
+  </node>
+</launch>
