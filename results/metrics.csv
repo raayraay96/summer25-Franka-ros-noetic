@@ -1,0 +1,4 @@
+metric,mean_ms,p50_ms,n,status,environment,date_utc,notes,command
+pipeline_cpu_stage_latency_ms,0.01928881462663412,0.019242987036705017,2000,measured,Linux-5.14.0-570.26.1.el9_6.x86_64-x86_64-with-glibc2.34; py3.9.21,2026-07-24T23:46:09.895858+00:00,CPU stages only (map+filter+workspace). Full ROS perception+control and physical Franka latency: Not yet measured.,python benchmarks/benchmark_latency.py
+mapping_latency_ms,0.0055038807913661,0.005423091351985931,5000,measured,Linux-5.14.0-570.26.1.el9_6.x86_64-x86_64-with-glibc2.34; py3.9.21,2026-07-24T23:46:09.721604+00:00,CPU-only coordinate mapping; not full perception pipeline,python benchmarks/benchmark_mapping.py
+physical_franka_tracking_error,,,,Not yet measured,franka_lab,,Requires physical Franka + calibrated camera,—

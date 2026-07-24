@@ -1,0 +1,14 @@
+{
+  "metric": "mapping_latency_ms",
+  "n": 5000,
+  "mean_ms": 0.0055038807913661,
+  "p50_ms": 0.005423091351985931,
+  "p95_ms": 0.005662441253662109,
+  "max_ms": 0.01991167664527893,
+  "hardware": "x86_64",
+  "os": "Linux-5.14.0-570.26.1.el9_6.x86_64-x86_64-with-glibc2.34",
+  "python": "3.9.21",
+  "date_utc": "2026-07-24T23:46:09.721604+00:00",
+  "command": "python benchmarks/benchmark_mapping.py",
+  "notes": "CPU-only coordinate mapping; not full perception pipeline"
+}
