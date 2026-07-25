@@ -26,20 +26,17 @@ export APPTAINER_TMPDIR="$DATA/ros2-cache/tmp"
 echo "host=$(hostname) job=$SLURM_JOB_ID date=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 ls -lh "$SIF"
 
-# 1280x720 fills RViz reliably under software GL (avoids black unused viewport).
 WIDTH=1280
 HEIGHT=720
 FPS=24
 RECORD_SEC=15
 WARMUP_SEC=16
-LOOP_SEC=12
 
 apptainer exec \
   -B "$REPO_DIR:/repo" -B "$DATA:/data" -B "$OUT:/out" -B "$DEMO:/demo" -B "$RESULTS:/results" \
   --env SLURM_JOB_ID="$SLURM_JOB_ID" \
   "$SIF" bash -lc "
 set -eo pipefail
-# Note: do not enable nounset (-u); ROS setup.bash references optional unbound vars.
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 export CC=/usr/bin/gcc CXX=/usr/bin/g++
 export AMENT_TRACE_SETUP_FILES=\${AMENT_TRACE_SETUP_FILES:-}
@@ -47,13 +44,14 @@ export COLCON_TRACE=\${COLCON_TRACE:-}
 unset CPATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH LIBRARY_PATH 2>/dev/null || true
 source /opt/ros/humble/setup.bash
 cd /repo/ros2_ws
-# Always rebuild so recording picks up marker/motion changes
 colcon build --packages-select franka_teleop_ros2 franka_teleop_bringup
 source install/setup.bash
 export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 export LIBGL_ALWAYS_SOFTWARE=1
 export QT_QPA_PLATFORM=xcb
 export MESA_GL_VERSION_OVERRIDE=3.3
+export QT_AUTO_SCREEN_SCALE_FACTOR=0
+export QT_SCALE_FACTOR=1
 export DISPLAY=:99
 
 command -v ffmpeg
@@ -63,39 +61,51 @@ Xvfb :99 -screen 0 ${WIDTH}x${HEIGHT}x24 -ac +extension GLX +render -noreset &
 XPID=\$!
 sleep 2
 
-ros2 launch franka_teleop_bringup panda_rviz_sim.launch.py \
-  use_rviz:=true diagnostics_out:=/out/sim_metrics.json &
+# Process group for clean teardown
+setsid bash -c 'source /opt/ros/humble/setup.bash; source /repo/ros2_ws/install/setup.bash; \
+  export RMW_IMPLEMENTATION=rmw_fastrtps_cpp LIBGL_ALWAYS_SOFTWARE=1 QT_QPA_PLATFORM=xcb \
+  MESA_GL_VERSION_OVERRIDE=3.3 DISPLAY=:99 QT_AUTO_SCREEN_SCALE_FACTOR=0 QT_SCALE_FACTOR=1; \
+  exec ros2 launch franka_teleop_bringup panda_rviz_sim.launch.py \
+    use_rviz:=true diagnostics_out:=/out/sim_metrics.json' &
 LPID=\$!
 sleep ${WARMUP_SEC}
 
+# Capture full Xvfb (RViz should fill 1280x720; chrome cropped in post-process)
 ffmpeg -y -video_size ${WIDTH}x${HEIGHT} -framerate ${FPS} -f x11grab -draw_mouse 0 -i :99.0 \
-  -t ${RECORD_SEC} -c:v libx264 -pix_fmt yuv420p -crf 20 /out/raw_demo.mp4
+  -t ${RECORD_SEC} -c:v libx264 -pix_fmt yuv420p -crf 18 /out/raw_demo.mp4
 
-kill \$LPID 2>/dev/null || true
-wait \$LPID 2>/dev/null || true
-sleep 1
+# Teardown process group, then exact-name leftovers
+kill -TERM -\$LPID 2>/dev/null || kill -TERM \$LPID 2>/dev/null || true
+sleep 2
+kill -KILL -\$LPID 2>/dev/null || kill -KILL \$LPID 2>/dev/null || true
 kill \$XPID 2>/dev/null || true
-wait \$XPID 2>/dev/null || true
 sleep 1
 for p in rviz2 robot_state_publisher mock_landmark_publisher human_to_robot_mapper \
          safety_monitor robot_controller target_visualizer diagnostics Xvfb; do
   pkill -x \"\$p\" 2>/dev/null || true
 done
 ls -lh /out/
-# Continue post-process even if ROS children complain on shutdown
-set +e
-true
 
-
-# --- Post-process: overlays, mock panel, GIF, contact sheet ---
 python3 /repo/scholar/postprocess_demo_v2.py \
   --raw /out/raw_demo.mp4 \
   --out-dir /out \
   --demo-dir /demo \
   --results-dir /results \
   --job-id \"\${SLURM_JOB_ID:-local}\" \
-  --repo /repo
+  --repo /repo \
+  --crop-top 52 \
+  --crop-bottom 28 \
+  --crop-left 0 \
+  --crop-right 0
+
+# Always exit 0 if media was produced (cleanup must not fail the job)
+if [[ -f /demo/ros2-franka-teleoperation-v2.mp4 ]]; then
+  echo RECORD_MEDIA_OK
+  exit 0
+fi
+exit 1
 "
 
 echo "RECORD_V2_DONE raw=$OUT demo=$DEMO job=$SLURM_JOB_ID"
-ls -lh "$DEMO"/ros2-franka-*-v2.* 2>/dev/null || ls -lh "$DEMO"
+ls -lh "$DEMO"/ros2-franka-*-v2.*
+exit 0

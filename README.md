@@ -2,7 +2,7 @@
 
 **End-effector position teleoperation** for a Franka Emika Panda using ROS Noetic, MediaPipe human pose estimation, optional monocular depth visualization, workspace safety filters, and a dry-run / simulation-first controller interface.
 
-Developed during the **HUMANS MOVE Program** at the University of Wyoming; portfolio engineering refresh on branch `portfolio-v2`.
+Developed during the **HUMANS MOVE Program** at the University of Wyoming; portfolio engineering refresh includes a verified ROS 2 Humble simulation path on Purdue Scholar.
 
 > **What this is not (yet):** metric depth SLAM, full upper-body joint mimicry, certified safety software, or a claim of validated physical Franka tracking accuracy. See [Limitations](#12-limitations).
 
@@ -22,15 +22,15 @@ Developed during the **HUMANS MOVE Program** at the University of Wyoming; portf
 
 Reproduction and evidence: [`docs/ros2-simulation.md`](docs/ros2-simulation.md) · [`scholar/ROS2_SIMULATION.md`](scholar/ROS2_SIMULATION.md) · [`results/ros2/`](results/ros2/)
 
-### Verified pipeline metrics (Scholar jobs 459319 sim / 459324 record)
+### Verified pipeline metrics (Scholar jobs **459328** sim / **459329** record — both COMPLETED)
 
 | Check | Result |
 |-------|--------|
 | `colcon build` | 2 packages OK |
 | Unit tests | 14 ROS 2 package tests passed |
 | Target / command / joint / safety rates | ~20 Hz |
-| Joint path travel (12 s verification window) | **4.37 rad** |
-| Max single-joint excursion | **0.84 rad** (sim) / **1.02 rad** (record) |
+| Joint path travel (12 s verification window) | **6.33 rad** |
+| Max single-joint excursion (record window) | **1.02 rad** (`1.0183587624341142`) |
 | Unexpected e-stop / timeout / joint-limit flags | none |
 | Physical hardware | **false** |
 | Depth used for control | **false** |
@@ -54,7 +54,7 @@ Historical depth visualizations from the research period (perception-only, not h
 
 ---
 
-## 2. Key features (implemented in `portfolio-v2`)
+## 2. Key features
 
 - Modular ROS node layout: pose → mapping → safety → controller
 - MediaPipe pose landmarks as timestamped JSON messages
@@ -64,6 +64,7 @@ Historical depth visualizations from the research period (perception-only, not h
 - Default **`dry_run`** control; real robot requires `use_robot:=true`
 - Optional MonoDepth2-style **relative** depth node (not metric)
 - YAML configuration under `src/vision_arm_control/config/`
+- ROS 2 Humble simulation package under `ros2_ws/` (RViz 2 fake-hardware path)
 - Unit tests for mapping, safety, filters, and launch/config validation
 - Benchmark scripts with honest “not yet measured” gaps
 - Purdue Scholar SLURM templates for GPU / batch work
@@ -110,7 +111,6 @@ Verified repository audit: [`docs/repository-audit.md`](docs/repository-audit.md
 ```bash
 git clone https://github.com/raayraay96/summer25-Franka-ros-noetic.git
 cd summer25-Franka-ros-noetic
-git checkout portfolio-v2
 
 python3 -m pip install -r requirements.txt
 # pure logic tests (no ROS required):
@@ -240,7 +240,7 @@ Based on repository evidence ([`docs/repository-audit.md`](docs/repository-audit
 - Example camera intrinsics/extrinsics until calibrated (`status: example`)
 - ROS Noetic / Ubuntu 20.04 is EOL-ish for new products; no ROS 2 migration in this branch
 - Full Gazebo+MoveIt stack not validated on the audit host (no ROS install)
-- Physical Franka execution not re-validated in `portfolio-v2` CI
+- Physical Franka execution not re-validated in CI
 - Software safety ≠ manufacturer safety certification
 
 ---
@@ -260,7 +260,7 @@ Based on repository evidence ([`docs/repository-audit.md`](docs/repository-audit
 | Work | Credit |
 |------|--------|
 | HUMANS MOVE research prototype, perception experiments, depth screenshots | Eric Raymond |
-| Portfolio refactor (`portfolio-v2`): architecture, safety, tests, docs, Scholar workflow | Eric Raymond |
+| Portfolio refactor: architecture, safety, tests, docs, Scholar workflow, ROS 2 demo | Eric Raymond |
 | MediaPipe | Google (Apache-2.0) |
 | MonoDepth2 | Niantic — cite and follow research license |
 | ROS / MoveIt / Franka packages | Open Robotics / Franka Robotics / community |
@@ -279,7 +279,7 @@ Based on repository evidence ([`docs/repository-audit.md`](docs/repository-audit
   author = {Raymond, Eric},
   title  = {Vision-Guided Franka Panda Teleoperation},
   year   = {2025},
-  note   = {HUMANS MOVE Program, University of Wyoming; portfolio branch portfolio-v2},
+  note   = {HUMANS MOVE Program, University of Wyoming; portfolio engineering refresh},
   url    = {https://github.com/raayraay96/summer25-Franka-ros-noetic}
 }
 ```

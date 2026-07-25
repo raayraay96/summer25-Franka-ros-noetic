@@ -50,7 +50,6 @@ sbatch scholar/record_ros2_demo.slurm
 Post-process only (from an existing raw capture):
 
 ```bash
-# inside container with ffmpeg
 python3 scholar/postprocess_demo_v2.py \
   --raw $RAW/raw_demo.mp4 \
   --out-dir $RAW \
@@ -64,16 +63,17 @@ python3 scholar/postprocess_demo_v2.py \
 
 | Item | Value |
 |------|--------|
-| Simulation job | **459319** (pipeline + rates + joint verification) |
-| Recording job | **459324** (COMPLETED; RViz X11 capture + v2 media) |
+| Simulation job | **459328** (**COMPLETED**) |
+| Recording job | **459329** (**COMPLETED**) |
 | `colcon build` | 2 packages OK |
-| Unit tests (`pytest`) | 14 passed (ROS 2 package) / 51 total with host pure-Python |
+| Unit tests (`pytest`) | 14 passed (ROS 2 package) |
 | Topic rates | ~20 Hz (`target_pose`, `command_pose`, `joint_states`, `safety_status`) |
-| Joint path travel (12 s window) | **4.37 rad** |
-| Max single-joint excursion | **0.84 rad** (sim) / **1.50 rad** (record window) |
+| Joint path travel (12 s window) | **6.33 rad** |
+| Max single-joint excursion (record window) | **1.02 rad** (`1.0183587624341142`) |
 | Unexpected e-stop / timeout / joint-limit flags | **none** |
 | Physical hardware | **false** |
 | Depth used for control | **false** |
+| Demo MP4 | **exactly 1280×720**, 24 fps, H.264 yuv420p, 12.0 s, 288 frames |
 
 Evidence files: [`results/ros2/`](../results/ros2/)  
 Demo assets: [`docs/demo/ros2-franka-teleoperation-v2.*`](demo/)

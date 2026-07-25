@@ -93,4 +93,6 @@ docs/demo/ros2-franka-thumbnail-v2.png
 
 Raw video (not in Git): `$RCAC_SCRATCH/franka-teleop-data/raw_video/`
 
-Verified Scholar jobs (v2): simulation **459319**, recording **459324**.
+Verified Scholar jobs (v2): simulation **459328** (COMPLETED), recording **459329** (COMPLETED).
+
+Record-window max single-joint excursion: **1.02 rad** (`1.0183587624341142`).

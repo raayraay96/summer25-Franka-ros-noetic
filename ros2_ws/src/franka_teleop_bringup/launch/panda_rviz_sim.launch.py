@@ -114,34 +114,13 @@ def generate_launch_description():
             arguments=["-d", rviz_cfg] if os.path.exists(rviz_cfg) else [],
             condition=IfCondition(use_rviz),
             output="screen",
-            # Force a single full-viewport window under Xvfb (no floating docks).
+            # Single full-window viewport under Xvfb (no side docks in config).
             additional_env={
                 "QT_AUTO_SCREEN_SCALE_FACTOR": "0",
                 "QT_SCALE_FACTOR": "1",
             },
         )
     )
-    # After RViz starts, hide docks and maximize the 3D view via Qt geometry
-    # helpers when available (best-effort; config also sets Hide Left/Right Dock).
-    if urdf_xacro:
-        nodes.append(
-            TimerAction(
-                period=4.0,
-                actions=[
-                    ExecuteProcess(
-                        cmd=[
-                            "bash",
-                            "-lc",
-                            # Resize main window to fill Xvfb; ignore failures.
-                            "command -v xdotool >/dev/null && "
-                            "xdotool search --name 'RViz' windowmove 0 0 "
-                            "windowsize 1280 720 2>/dev/null || true",
-                        ],
-                        output="screen",
-                    )
-                ],
-            )
-        )
 
     # Label banner in logs
     nodes.append(

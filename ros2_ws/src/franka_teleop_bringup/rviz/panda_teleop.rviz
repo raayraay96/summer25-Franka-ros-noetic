@@ -1,8 +1,7 @@
-Panels:
-  - Class: rviz_common/Displays
-    Name: Displays
-  - Class: rviz_common/Views
-    Name: Views
+# Minimal RViz 2 layout for demo recording.
+# No Displays/Views docks; 3D viewport fills the window as much as RViz allows.
+# Menu/status chrome is removed in post-process (top/bottom crop).
+Panels: []
 Visualization Manager:
   Class: ""
   Displays:
@@ -54,19 +53,6 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /teleop/markers
       Value: true
-    - Axes Length: 0.08
-      Axes Radius: 0.008
-      Class: rviz_default_plugins/Pose
-      Enabled: true
-      Name: CommandPose
-      Shape: Axes
-      Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /teleop/command_pose
-      Value: true
   Enabled: true
   Global Options:
     Background Color: 36; 40; 48
@@ -76,7 +62,6 @@ Visualization Manager:
   Tools:
     - Class: rviz_default_plugins/Interact
     - Class: rviz_default_plugins/MoveCamera
-    - Class: rviz_default_plugins/Select
   Transformation:
     Current:
       Class: rviz_default_plugins/TF
@@ -84,34 +69,30 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 2.15
+      Distance: 2.05
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.32
-        Y: 0.02
-        Z: 0.36
+        X: 0.30
+        Y: 0.0
+        Z: 0.38
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.48
+      Pitch: 0.45
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz_default_plugins)
-      Yaw: 0.95
+      Yaw: 0.92
     Saved: ~
 Window Geometry:
-  Displays:
-    collapsed: true
   Height: 720
   Hide Left Dock: true
   Hide Right Dock: true
-  Views:
-    collapsed: true
   Width: 1280
   X: 0
   Y: 0

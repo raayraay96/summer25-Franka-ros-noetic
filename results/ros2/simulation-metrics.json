@@ -1,15 +1,15 @@
 {
-  "elapsed_sec": 46.00639581680298,
+  "elapsed_sec": 46.005311012268066,
   "topic_rates_hz": {
-    "target_pose": 19.99721959667154,
-    "command_pose": 19.953747380157036,
-    "joint_states": 19.975483488414287,
-    "safety_status": 19.99721959667154
+    "target_pose": 19.889008026834126,
+    "command_pose": 19.823798164451063,
+    "joint_states": 19.975954510011544,
+    "safety_status": 19.889008026834126
   },
-  "joint_state_travel_rad": 20.880113234638372,
-  "joint_state_path_travel_rad": 20.880113234638372,
-  "joint_state_start_end_travel_rad": 2.1613887038513995,
-  "max_single_joint_excursion_rad": 0.9964021759663382,
+  "joint_state_travel_rad": 25.948377276098,
+  "joint_state_path_travel_rad": 25.948377276098,
+  "joint_state_start_end_travel_rad": 1.8573872157751599,
+  "max_single_joint_excursion_rad": 1.0183550041937082,
   "joints_moved": true,
   "n_joint_samples": 919,
   "simulation_label": "RViz 2 fake-hardware / joint_state simulation",

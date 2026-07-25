@@ -16,7 +16,6 @@ REPO_DIR="${REPO_DIR:-/scratch/scholar/edraymon/franka-teleoperation}"
 DATA="${RCAC_SCRATCH:-/scratch/scholar/edraymon}/franka-teleop-data"
 SIF="${SIF:-$DATA/containers/ros2_humble_franka.sif}"
 OUT="$DATA/outputs/ros2_sim_${SLURM_JOB_ID}"
-WS="$REPO_DIR/ros2_ws"
 RESULTS="$REPO_DIR/results/ros2"
 mkdir -p "$OUT" "$RESULTS" "$DATA/logs"
 
@@ -27,15 +26,17 @@ echo "host=$(hostname) job=$SLURM_JOB_ID date=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo "SIF=$SIF"
 ls -lh "$SIF"
 
-# Bind repo + data into container
 BINDS=(-B "$REPO_DIR:/repo" -B "$DATA:/data" -B "$OUT:/out")
 
 run() {
-  apptainer exec "${BINDS[@]}" "$SIF" bash -lc "$*"
+  # Do not enable nounset inside ROS setup paths.
+  apptainer exec "${BINDS[@]}" "$SIF" bash -lc "set -eo pipefail; $*"
 }
 
 # Environment metadata
-run 'source /opt/ros/humble/setup.bash
+run 'export AMENT_TRACE_SETUP_FILES=${AMENT_TRACE_SETUP_FILES:-}
+export COLCON_TRACE=${COLCON_TRACE:-}
+source /opt/ros/humble/setup.bash
 python3 - <<PY
 import json, platform, os, subprocess
 from datetime import datetime, timezone
@@ -61,38 +62,64 @@ print(meta)
 PY'
 
 # Build workspace
-run 'source /opt/ros/humble/setup.bash
-set -e
-# Prevent Scholar host modules (spack gcc) from leaking into container builds
+run 'export AMENT_TRACE_SETUP_FILES=${AMENT_TRACE_SETUP_FILES:-}
+export COLCON_TRACE=${COLCON_TRACE:-}
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 export CC=/usr/bin/gcc
 export CXX=/usr/bin/g++
 unset CPATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH LIBRARY_PATH 2>/dev/null || true
+source /opt/ros/humble/setup.bash
 cd /repo/ros2_ws
-rm -rf build install log || true
+# Prefer clean rebuild, but do not fail if concurrent jobs hold build dirs
+rm -rf build install log 2>/dev/null || true
 colcon build --packages-select franka_teleop_ros2 franka_teleop_bringup 2>&1 | tee /out/build.log
 source install/setup.bash
 colcon test --packages-select franka_teleop_ros2 --event-handlers console_direct+ 2>&1 | tee /out/test.log || true
 colcon test-result --verbose 2>&1 | tee /out/test-result.txt || true
 '
 
-# Pure pytest as well
-run 'source /opt/ros/humble/setup.bash
+# Pure pytest
+run 'export AMENT_TRACE_SETUP_FILES=${AMENT_TRACE_SETUP_FILES:-}
+source /opt/ros/humble/setup.bash
 cd /repo/ros2_ws/src/franka_teleop_ros2
 python3 -m pytest -q test/ 2>&1 | tee /out/pytest.txt
 '
 
-# Headless simulation (no RViz) for topic/joint verification
-run 'source /opt/ros/humble/setup.bash
+# Headless simulation verification — process group + clean exit on success
+# Critical: never leave ROS children that hang squashfuse; always exit 0 if
+# joint-verification.json was written successfully.
+run 'export AMENT_TRACE_SETUP_FILES=${AMENT_TRACE_SETUP_FILES:-}
+export COLCON_TRACE=${COLCON_TRACE:-}
+source /opt/ros/humble/setup.bash
 source /repo/ros2_ws/install/setup.bash
-set -e
 export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 DIAG=/out/simulation-metrics.json
-# Start pipeline without RViz
-ros2 launch franka_teleop_bringup panda_rviz_sim.launch.py use_rviz:=false diagnostics_out:=$DIAG &
+VERIFY_OK=0
+
+cleanup() {
+  # Kill launch process group if still alive
+  if [[ -n "${LPID:-}" ]]; then
+    kill -TERM -"$LPID" 2>/dev/null || kill -TERM "$LPID" 2>/dev/null || true
+    sleep 1
+    kill -KILL -"$LPID" 2>/dev/null || kill -KILL "$LPID" 2>/dev/null || true
+  fi
+  # Exact-name children only (never pkill -f on the shell)
+  for p in mock_landmark_publisher human_to_robot_mapper safety_monitor \
+           robot_controller target_visualizer diagnostics robot_state_publisher rviz2; do
+    pkill -x "$p" 2>/dev/null || true
+  done
+  sleep 1
+}
+
+trap cleanup EXIT
+
+# New session/process group so we can kill the whole tree cleanly
+setsid bash -c "source /opt/ros/humble/setup.bash; source /repo/ros2_ws/install/setup.bash; \
+  export RMW_IMPLEMENTATION=rmw_fastrtps_cpp; \
+  exec ros2 launch franka_teleop_bringup panda_rviz_sim.launch.py use_rviz:=false diagnostics_out:=$DIAG" &
 LPID=$!
 sleep 12
-# Collect topic evidence
+
 {
   echo "=== nodes ==="
   ros2 node list || true
@@ -110,7 +137,6 @@ sleep 12
   timeout 3 ros2 topic echo /teleop/safety_status --once || true
 } | tee /out/topic-evidence.txt
 
-# Capture joint travel over 12s (one demo period)
 python3 - <<PY
 import json, time
 import rclpy
@@ -155,7 +181,6 @@ if len(n.js) >= 2:
     for j in range(len(n.js[0])):
         series = [s[j] for s in n.js]
         max_exc = max(max_exc, max(series) - min(series))
-# Safety: flag unexpected e-stop / timeout strings
 bad = [s for s in n.safety if any(k in s for k in ("emergency", "estop", "timeout", "stale", "joint_limit"))]
 out = {
   "joint_samples": len(n.js),
@@ -172,34 +197,75 @@ out = {
   "physical_hardware": False,
   "depth_used_for_control": False,
   "ik_type": "geometric_approximation",
+  "slurm_job_id": __import__("os").environ.get("SLURM_JOB_ID", ""),
 }
 open("/out/joint-verification.json","w").write(json.dumps(out, indent=2)+"\n")
 print(out)
-n.destroy_node(); rclpy.shutdown()
+ok = bool(out.get("joints_moved") and out.get("joint_samples", 0) >= 50 and out.get("command_pose_count", 0) >= 50)
+open("/out/VERIFY_OK" if ok else "/out/VERIFY_FAIL","w").write(("ok\n" if ok else "fail\n"))
+n.destroy_node()
+rclpy.shutdown()
+if not ok:
+    raise SystemExit("joint verification failed (no motion or insufficient samples)")
 PY
 
-# Cleanup launch without broad pkill (avoids killing the container bash / SIGTERM 15)
-kill $LPID 2>/dev/null || true
-wait $LPID 2>/dev/null || true
-sleep 1
-# Best-effort node teardown by exact executable name only
-for p in mock_landmark_publisher human_to_robot_mapper safety_monitor \
-         robot_controller target_visualizer diagnostics robot_state_publisher rviz2; do
-  pkill -x "$p" 2>/dev/null || true
-done
-sleep 1
-true
+cleanup
+trap - EXIT
+# Success only when verification passed with real motion evidence.
+# Cleanup must not turn a green verification red (squashfuse hang).
+if [[ -f /out/VERIFY_OK && -f /out/joint-verification.json ]]; then
+  echo "VERIFY_OK"
+  exit 0
+fi
+echo "VERIFY_FAILED" >&2
+exit 1
 '
 
-# Ensure copy runs even if container reported a non-zero from background teardown
-set +e
-
-# Copy lightweight results into git tree
+# Copy results (host side; always runs after container success)
 cp -f "$OUT"/*.json "$RESULTS/" 2>/dev/null || true
 cp -f "$OUT"/topic-evidence.txt "$RESULTS/" 2>/dev/null || true
 cp -f "$OUT"/build.log "$RESULTS/build-summary.txt" 2>/dev/null || true
 cp -f "$OUT"/pytest.txt "$RESULTS/test-summary.txt" 2>/dev/null || true
 cp -f "$OUT"/environment.json "$RESULTS/" 2>/dev/null || true
 
-echo "SIM_DONE out=$OUT results=$RESULTS"
+# Stamp run-summary with this job id
+python3 - <<PY
+import json, os
+from pathlib import Path
+from datetime import datetime, timezone
+R = Path("$RESULTS")
+jv = json.loads((R/"joint-verification.json").read_text()) if (R/"joint-verification.json").is_file() else {}
+sim = json.loads((R/"simulation-metrics.json").read_text()) if (R/"simulation-metrics.json").is_file() else {}
+rates = {k: round(v, 3) for k, v in (sim.get("topic_rates_hz") or {}).items()}
+summary = {
+  "simulation_job_id": int(os.environ.get("SLURM_JOB_ID", "0") or 0),
+  "simulation_job_state": "COMPLETED",
+  "date_utc": datetime.now(timezone.utc).isoformat(),
+  "build": "2 packages OK",
+  "pytest_ros2_package": open("$OUT/pytest.txt").read().strip() if Path("$OUT/pytest.txt").is_file() else "",
+  "topic_rates_hz": rates,
+  "joint_verification_12s": jv,
+  "physical_hardware": False,
+  "depth_used_for_control": False,
+  "ik_type": "geometric_approximation",
+}
+# Preserve recording fields if present
+if (R/"run-summary.json").is_file():
+    old = json.loads((R/"run-summary.json").read_text())
+    for k in ("recording_job_id", "recording_job_state", "recording_diagnostics", "demo_assets", "labels"):
+        if k in old:
+            summary[k] = old[k]
+(R/"run-summary.json").write_text(json.dumps(summary, indent=2) + "\n")
+if rates:
+    (R/"topic-rates.json").write_text(json.dumps({
+        "job_id": str(os.environ.get("SLURM_JOB_ID", "")),
+        "topic_rates_hz": rates,
+        "window_sec": sim.get("elapsed_sec"),
+        "source": "diagnostics",
+    }, indent=2) + "\n")
+print(json.dumps(summary, indent=2)[:800])
+PY
+
+echo "SIM_DONE out=$OUT results=$RESULTS job=$SLURM_JOB_ID"
 ls -la "$OUT"
+exit 0

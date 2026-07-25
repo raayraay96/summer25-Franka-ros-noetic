@@ -1,6 +1,6 @@
 Starting >>> franka_teleop_ros2
-Finished <<< franka_teleop_ros2 [1.22s]
+Finished <<< franka_teleop_ros2 [1.24s]
 Starting >>> franka_teleop_bringup
-Finished <<< franka_teleop_bringup [1.06s]
+Finished <<< franka_teleop_bringup [1.07s]
 
-Summary: 2 packages finished [2.68s]
+Summary: 2 packages finished [2.72s]

@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""Publish visualization markers for mock target, command, EE, and trajectories.
+"""Publish visualization markers for target, command, EE, and trajectories.
 
-Marker legend (distinct, accessible colors):
-  Cyan sphere + label  — Mock human target  (/teleop/target_pose)
-  Lime sphere + label  — Accepted command   (/teleop/command_pose)
-  Orange sphere        — End-effector       (/teleop/ee_pose or command)
-  Cyan line strip      — Target trajectory
-  Lime line strip      — Command trajectory
-  Semi-transparent box — Workspace bounds (optional legend anchors)
+In-scene labels are intentionally omitted — the recruiter-facing legend is a
+compact overlay burned into the demo video (post-process) so it stays readable
+and does not scatter text across the robot.
+
+Marker colors (match post-process legend):
+  Cyan sphere / trail  — Target            (/teleop/target_pose)
+  Lime sphere / trail  — Accepted command  (/teleop/command_pose)
+  Orange sphere        — End effector      (/teleop/ee_pose)
 """
 from __future__ import annotations
 
@@ -15,16 +16,14 @@ from collections import deque
 from typing import Deque, Optional, Tuple
 
 import rclpy
-from geometry_msgs.msg import Point, Pose, PoseStamped
+from geometry_msgs.msg import Point, PoseStamped
 from rclpy.node import Node
 from visualization_msgs.msg import Marker, MarkerArray
 
 
-# Accessible-ish RGB (0-1)
 CYAN = (0.15, 0.75, 0.95)
 LIME = (0.20, 0.90, 0.25)
 ORANGE = (1.00, 0.55, 0.10)
-LEGEND_BG = (0.12, 0.14, 0.18)
 
 
 class TargetVisualizer(Node):
@@ -34,9 +33,9 @@ class TargetVisualizer(Node):
         self.declare_parameter("command_topic", "/teleop/command_pose")
         self.declare_parameter("ee_topic", "/teleop/ee_pose")
         self.declare_parameter("marker_topic", "/teleop/markers")
-        self.declare_parameter("trail_length", 80)
+        self.declare_parameter("trail_length", 90)
         self.declare_parameter("base_frame", "panda_link0")
-        self.declare_parameter("sphere_scale", 0.05)
+        self.declare_parameter("sphere_scale", 0.055)
         self.declare_parameter("show_workspace", True)
         self.declare_parameter("workspace.x_min", 0.25)
         self.declare_parameter("workspace.x_max", 0.70)
@@ -58,7 +57,6 @@ class TargetVisualizer(Node):
 
         topic = str(self.get_parameter("marker_topic").value)
         self.pub = self.create_publisher(MarkerArray, topic, 10)
-        # Also keep single-Marker topic for older RViz configs
         self.pub_one = self.create_publisher(Marker, topic + "_single", 10)
 
         self.create_subscription(
@@ -71,7 +69,7 @@ class TargetVisualizer(Node):
             PoseStamped, str(self.get_parameter("ee_topic").value), self._ee_cb, 10
         )
         self.create_timer(0.05, self._publish)
-        self.get_logger().info("target_visualizer ready (markers + trajectories + legend)")
+        self.get_logger().info("target_visualizer ready (spheres + trails; legend is video overlay)")
 
     def _pos(self, pose: PoseStamped) -> Tuple[float, float, float]:
         p = pose.pose.position
@@ -84,19 +82,18 @@ class TargetVisualizer(Node):
     def _cmd_cb(self, msg: PoseStamped) -> None:
         self._last_cmd = msg
         self.cmd_trail.append(self._pos(msg))
-        # Fallback EE if dedicated topic not published yet
         if self._last_ee is None:
             self._last_ee = msg
 
     def _ee_cb(self, msg: PoseStamped) -> None:
         self._last_ee = msg
 
-    def _header(self, stamp=None):
+    def _header(self):
         from std_msgs.msg import Header
 
         h = Header()
         h.frame_id = self.base_frame
-        h.stamp = stamp if stamp is not None else self.get_clock().now().to_msg()
+        h.stamp = self.get_clock().now().to_msg()
         return h
 
     def _sphere(
@@ -123,30 +120,6 @@ class TargetVisualizer(Node):
         m.lifetime.sec = 0
         return m
 
-    def _text(
-        self,
-        mid: int,
-        xyz: Tuple[float, float, float],
-        text: str,
-        rgb: Tuple[float, float, float],
-        scale: float = 0.045,
-    ) -> Marker:
-        m = Marker()
-        m.header = self._header()
-        m.ns = "labels"
-        m.id = mid
-        m.type = Marker.TEXT_VIEW_FACING
-        m.action = Marker.ADD
-        m.pose.position.x = xyz[0]
-        m.pose.position.y = xyz[1]
-        m.pose.position.z = xyz[2] + 0.06
-        m.pose.orientation.w = 1.0
-        m.scale.z = scale
-        m.color.a = 1.0
-        m.color.r, m.color.g, m.color.b = rgb
-        m.text = text
-        return m
-
     def _line_strip(
         self,
         mid: int,
@@ -161,8 +134,8 @@ class TargetVisualizer(Node):
         m.type = Marker.LINE_STRIP
         m.action = Marker.ADD
         m.pose.orientation.w = 1.0
-        m.scale.x = 0.012
-        m.color.a = 0.85
+        m.scale.x = 0.014
+        m.color.a = 0.88
         m.color.r, m.color.g, m.color.b = rgb
         m.points = []
         for x, y, z in points:
@@ -170,7 +143,6 @@ class TargetVisualizer(Node):
             pt.x, pt.y, pt.z = x, y, z
             m.points.append(pt)
         if not m.points:
-            # Empty strip — publish delete-safe dummy
             m.action = Marker.DELETE
         return m
 
@@ -194,68 +166,49 @@ class TargetVisualizer(Node):
         m.scale.x = max(xmax - xmin, 0.01)
         m.scale.y = max(ymax - ymin, 0.01)
         m.scale.z = max(zmax - zmin, 0.01)
-        m.color.a = 0.08
+        m.color.a = 0.06
         m.color.r, m.color.g, m.color.b = 0.6, 0.7, 0.9
         return m
 
-    def _legend(self) -> list:
-        """Floating legend near the base (unobtrusive, in free space)."""
-        # Place legend to the left of the robot base, above the floor
-        origin = (-0.15, -0.55, 0.55)
-        items = [
-            (0, "Mock human target", CYAN),
-            (1, "Accepted command", LIME),
-            (2, "End-effector", ORANGE),
-        ]
-        markers = []
-        for i, (idx, label, rgb) in enumerate(items):
-            y = origin[1] + i * 0.08
-            xyz = (origin[0], y, origin[2])
-            markers.append(self._sphere(60 + idx, xyz, rgb, scale=0.035, ns="legend"))
-            markers.append(
-                self._text(70 + idx, (origin[0] + 0.08, y, origin[2] - 0.05), label, rgb, 0.038)
-            )
-        # Title
-        markers.append(
-            self._text(
-                80,
-                (origin[0] + 0.05, origin[1] - 0.06, origin[2] + 0.02),
-                "Legend",
-                (0.9, 0.9, 0.9),
-                0.04,
-            )
-        )
-        return markers
+    def _delete_legacy_labels(self) -> list:
+        """Delete any leftover TEXT markers from older visualizer versions."""
+        out = []
+        for mid in list(range(11, 20)) + list(range(60, 90)):
+            m = Marker()
+            m.header = self._header()
+            m.ns = "labels" if mid < 60 else "legend"
+            m.id = mid
+            m.action = Marker.DELETE
+            out.append(m)
+        return out
 
     def _publish(self) -> None:
         arr = MarkerArray()
-        markers = []
+        markers = self._delete_legacy_labels()
 
         if self._last_target is not None:
             xyz = self._pos(self._last_target)
-            markers.append(self._sphere(1, xyz, CYAN, scale=self.sphere_scale * 1.15))
+            markers.append(self._sphere(1, xyz, CYAN, scale=self.sphere_scale * 1.1))
             markers.append(self._line_strip(21, self.target_trail, CYAN, "target_trail"))
 
         if self._last_cmd is not None:
             xyz = self._pos(self._last_cmd)
-            markers.append(self._sphere(2, xyz, LIME, scale=self.sphere_scale * 1.05))
+            markers.append(self._sphere(2, xyz, LIME, scale=self.sphere_scale))
             markers.append(self._line_strip(22, self.cmd_trail, LIME, "cmd_trail"))
 
         if self._last_ee is not None:
             xyz = self._pos(self._last_ee)
-            # Slightly larger EE sphere so motion reads at a glance
             markers.append(self._sphere(3, xyz, ORANGE, scale=self.sphere_scale * 0.95))
 
         if self.show_workspace:
             markers.append(self._workspace_box())
 
-        markers.extend(self._legend())
-
         arr.markers = markers
         self.pub.publish(arr)
-        # Keep last sphere on single-marker topic for compatibility
         if markers:
-            self.pub_one.publish(markers[0])
+            # Prefer a sphere marker for legacy single-topic consumers
+            spheres = [m for m in markers if m.type == Marker.SPHERE and m.action == Marker.ADD]
+            self.pub_one.publish(spheres[0] if spheres else markers[0])
 
 
 def main(args=None) -> None:
