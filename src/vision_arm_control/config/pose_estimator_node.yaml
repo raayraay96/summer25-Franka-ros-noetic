@@ -1,0 +1,11 @@
+# Private parameters for pose_estimator_node.py
+image_topic: "/camera/color/image_raw/compressed"
+transport: "compressed"
+frame_id: "camera_optical_frame"
+min_detection_confidence: 0.5
+min_tracking_confidence: 0.5
+model_complexity: 1
+publish_visualization: true
+headless: true
+pose_timeout_sec: 0.5
+log_every_n_frames: 30
