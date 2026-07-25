@@ -23,6 +23,8 @@ class SafetyMonitorNode(Node):
         self.declare_parameter("require_deadman", False)  # false for pure sim demos
         self.declare_parameter("max_command_hz", 30.0)
         self.declare_parameter("pose_timeout_sec", 0.75)
+        self.declare_parameter("command_stale_sec", 0.25)
+        self.declare_parameter("watchdog_hz", 10.0)
         self.declare_parameter("workspace_mode", "clamp")
         self.declare_parameter("workspace.x_min", 0.25)
         self.declare_parameter("workspace.x_max", 0.70)
@@ -54,19 +56,21 @@ class SafetyMonitorNode(Node):
             max_linear_velocity=float(self.get_parameter("max_linear_velocity").value),
             max_command_hz=float(self.get_parameter("max_command_hz").value),
             pose_timeout_sec=float(self.get_parameter("pose_timeout_sec").value),
+            command_stale_sec=float(self.get_parameter("command_stale_sec").value),
             workspace_mode=str(self.get_parameter("workspace_mode").value),
             require_deadman=bool(self.get_parameter("require_deadman").value),
             allow_real_robot=allow_real,
         )
         self.monitor = SafetyMonitor(config=cfg, control_mode=control_mode)
-        # For simulation, dead-man defaults to enabled if not required
+        # For simulation, dead-man defaults to enabled if not required.
         if not cfg.require_deadman:
             self.monitor.set_deadman(True)
         self.rate = CommandRateLimiter(max_hz=float(self.get_parameter("max_command_hz").value))
+        self._timeout_cancelled = False
 
         if control_mode == ControlMode.REAL_ROBOT:
             self.get_logger().error(
-                "REAL ROBOT MODE — software safeguards do not replace Franka E-stop."
+                "REAL ROBOT MODE: software safeguards do not replace Franka E-stop."
             )
 
         self.pub = self.create_publisher(
@@ -81,44 +85,76 @@ class SafetyMonitorNode(Node):
         )
         self.create_subscription(Bool, "/teleop/emergency_stop", self._estop_cb, 10)
         self.create_subscription(Bool, "/teleop/deadman", self._deadman_cb, 10)
+        watchdog_hz = max(float(self.get_parameter("watchdog_hz").value), 1.0)
+        self.create_timer(1.0 / watchdog_hz, self._watchdog)
         self.get_logger().info(
-            f"safety_monitor mode={self.monitor.control_mode.value} "
-            f"allow_real={allow_real}"
+            f"safety_monitor mode={self.monitor.control_mode.value} allow_real={allow_real}"
         )
+
+    def _publish_cancel(self, cancelled: bool) -> None:
+        msg = Bool()
+        msg.data = bool(cancelled)
+        self.cancel_pub.publish(msg)
 
     def _estop_cb(self, msg: Bool) -> None:
         if msg.data:
             self.monitor.request_emergency_stop()
-            c = Bool()
-            c.data = True
-            self.cancel_pub.publish(c)
-            self.get_logger().error("EMERGENCY STOP — cancel trajectory asserted")
+            self._publish_cancel(True)
+            self.get_logger().error("EMERGENCY STOP: cancel trajectory asserted")
         else:
             self.monitor.clear_emergency_stop()
+            # Explicitly release the controller latch. A later watchdog cycle can
+            # reassert cancellation if pose input is still unavailable.
+            self._publish_cancel(False)
+            self._timeout_cancelled = False
             self.get_logger().warn("Emergency stop cleared")
 
     def _deadman_cb(self, msg: Bool) -> None:
         self.monitor.set_deadman(msg.data)
 
+    def _watchdog(self) -> None:
+        now = self.get_clock().now().nanoseconds * 1e-9
+        age = self.monitor.pose_monitor.age(now)
+        if age is None:
+            return
+        if age > self.monitor.config.pose_timeout_sec and not self._timeout_cancelled:
+            self._timeout_cancelled = True
+            self._publish_cancel(True)
+            status = String()
+            status.data = "pose_timeout_watchdog"
+            self.status_pub.publish(status)
+            self.get_logger().warn("Pose timeout: simulated trajectory cancelled")
+
     def _cb(self, msg: PoseStamped) -> None:
         now = self.get_clock().now().nanoseconds * 1e-9
         self.monitor.note_pose(now)
+
+        if self._timeout_cancelled and not self.monitor.emergency_stop:
+            self._timeout_cancelled = False
+            self._publish_cancel(False)
+
         if not self.rate.allow(now):
-            s = String()
-            s.data = "rate_limited"
-            self.status_pub.publish(s)
+            status = String()
+            status.data = "rate_limited"
+            self.status_pub.publish(status)
             return
+
+        stamp = msg.header.stamp
+        command_timestamp = float(stamp.sec) + float(stamp.nanosec) * 1e-9
         pos = [msg.pose.position.x, msg.pose.position.y, msg.pose.position.z]
-        decision = self.monitor.evaluate_position(pos, now)
-        s = String()
-        s.data = decision.reason
-        self.status_pub.publish(s)
+        decision = self.monitor.evaluate_position(
+            pos,
+            now,
+            command_timestamp=command_timestamp if command_timestamp > 0.0 else None,
+        )
+        status = String()
+        status.data = decision.reason
+        self.status_pub.publish(status)
         if not decision.accepted or decision.position is None:
-            if decision.emergency_stop:
-                c = Bool()
-                c.data = True
-                self.cancel_pub.publish(c)
+            if decision.emergency_stop or decision.reason in {"command_stale", "pose_timeout"}:
+                self._publish_cancel(True)
             return
+
         out = PoseStamped()
         out.header = msg.header
         out.header.stamp = self.get_clock().now().to_msg()
