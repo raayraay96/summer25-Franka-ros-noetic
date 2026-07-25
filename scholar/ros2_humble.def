@@ -1,0 +1,89 @@
+Bootstrap: docker
+From: osrf/ros:humble-desktop
+
+# ROS 2 Humble + MoveIt 2 + ros2_control + RViz + Xvfb + FFmpeg
+# Built for Purdue Scholar via Apptainer (no sudo on host).
+
+%environment
+    export ROS_DISTRO=humble
+    export LANG=C.UTF-8
+    export LC_ALL=C.UTF-8
+    export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+    export QT_X11_NO_MITSHM=1
+    export LIBGL_ALWAYS_SOFTWARE=1
+    # Headless OpenGL for RViz in Xvfb
+    export MESA_GL_VERSION_OVERRIDE=3.3
+    . /opt/ros/humble/setup.sh
+
+%post
+    set -e
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update
+    apt-get install -y --no-install-recommends \
+        python3-pip \
+        python3-numpy \
+        python3-yaml \
+        python3-opencv \
+        python3-pytest \
+        python3-colcon-common-extensions \
+        python3-rosdep \
+        python3-vcstool \
+        ros-humble-moveit \
+        ros-humble-moveit-resources-panda-moveit-config \
+        ros-humble-moveit-resources-panda-description \
+        ros-humble-moveit-configs-utils \
+        ros-humble-moveit-ros-move-group \
+        ros-humble-moveit-ros-planning-interface \
+        ros-humble-moveit-ros-visualization \
+        ros-humble-moveit-servo \
+        ros-humble-controller-manager \
+        ros-humble-ros2-control \
+        ros-humble-ros2-controllers \
+        ros-humble-joint-state-broadcaster \
+        ros-humble-joint-trajectory-controller \
+        ros-humble-robot-state-publisher \
+        ros-humble-xacro \
+        ros-humble-tf2-ros \
+        ros-humble-tf-transformations \
+        ros-humble-rviz2 \
+        ros-humble-topic-tools \
+        ros-humble-demo-nodes-cpp \
+        xvfb \
+        x11-utils \
+        x11-xserver-utils \
+        mesa-utils \
+        libgl1-mesa-dri \
+        libgl1-mesa-glx \
+        ffmpeg \
+        git \
+        curl \
+        ca-certificates \
+        python3-transforms3d
+    # transforms helpers for Python
+    pip3 install --no-cache-dir transforms3d || true
+    # Initialize rosdep if needed
+    if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then
+        rosdep init || true
+    fi
+    rosdep update || true
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+    # Smoke markers
+    echo "ROS2_HUMBLE_FRANKA_TELEOP=1" > /etc/franka_teleop_ros2.env
+    . /opt/ros/humble/setup.sh
+    ros2 pkg list | grep -E 'moveit|panda|controller' | head -40 > /etc/ros2_pkg_smoke.txt || true
+
+%runscript
+    #!/bin/bash
+    set -e
+    source /opt/ros/humble/setup.bash
+    if [ -f /ws/install/setup.bash ]; then
+        source /ws/install/setup.bash
+    fi
+    exec "$@"
+
+%labels
+    Author Eric Raymond
+    Version 0.1.0
+    Description ROS 2 Humble MoveIt2 Panda teleop simulation for Scholar
