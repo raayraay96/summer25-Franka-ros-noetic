@@ -1,0 +1,13 @@
+# Private parameters for depth_estimator_node.py
+# MonoDepth2 output is relative depth and is visualization-only in this project.
+image_topic: "/camera/color/image_raw/compressed"
+enabled: true
+headless: true
+force_cpu: false
+input_width: 640
+input_height: 192
+log_every_n_frames: 30
+model_dir: ""
+monodepth2_path: ""
+encoder_filename: "encoder.pth"
+depth_filename: "depth.pth"
