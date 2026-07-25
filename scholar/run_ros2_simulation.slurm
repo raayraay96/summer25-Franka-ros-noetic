@@ -110,54 +110,89 @@ sleep 12
   timeout 3 ros2 topic echo /teleop/safety_status --once || true
 } | tee /out/topic-evidence.txt
 
-# Capture joint travel over 8s
+# Capture joint travel over 12s (one demo period)
 python3 - <<PY
 import json, time
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import PoseStamped
+from std_msgs.msg import String
 
 class Cap(Node):
     def __init__(self):
         super().__init__("cap")
         self.js = []
         self.cmd = 0
+        self.tgt = 0
+        self.safety = []
         self.create_subscription(JointState, "/joint_states", self._j, 10)
         self.create_subscription(PoseStamped, "/teleop/command_pose", self._c, 10)
+        self.create_subscription(PoseStamped, "/teleop/target_pose", self._t, 10)
+        self.create_subscription(String, "/teleop/safety_status", self._s, 10)
     def _j(self, m):
         if m.position:
             self.js.append(list(m.position[:7]))
     def _c(self, m):
         self.cmd += 1
+    def _t(self, m):
+        self.tgt += 1
+    def _s(self, m):
+        self.safety.append(m.data)
 
 rclpy.init()
 n = Cap()
-end = time.time() + 8.0
+end = time.time() + 12.0
 while time.time() < end:
     rclpy.spin_once(n, timeout_sec=0.1)
-travel = 0.0
+path_travel = 0.0
+start_end = 0.0
+max_exc = 0.0
 if len(n.js) >= 2:
-    travel = sum(abs(b-a) for a,b in zip(n.js[0], n.js[-1]))
+    for a, b in zip(n.js, n.js[1:]):
+        path_travel += sum(abs(bi - ai) for ai, bi in zip(a, b))
+    start_end = sum(abs(b - a) for a, b in zip(n.js[0], n.js[-1]))
+    for j in range(len(n.js[0])):
+        series = [s[j] for s in n.js]
+        max_exc = max(max_exc, max(series) - min(series))
+# Safety: flag unexpected e-stop / timeout strings
+bad = [s for s in n.safety if any(k in s for k in ("emergency", "estop", "timeout", "stale", "joint_limit"))]
 out = {
   "joint_samples": len(n.js),
-  "joint_travel_rad": travel,
-  "joints_moved": travel > 0.05,
+  "joint_travel_rad": path_travel,
+  "joint_path_travel_rad": path_travel,
+  "joint_start_end_travel_rad": start_end,
+  "max_single_joint_excursion_rad": max_exc,
+  "joints_moved": path_travel > 0.05,
   "command_pose_count": n.cmd,
+  "target_pose_count": n.tgt,
+  "safety_status_samples": len(n.safety),
+  "unexpected_safety_flags": bad[:20],
   "simulation_backend": "RViz 2 fake-hardware / joint_state simulation",
   "physical_hardware": False,
+  "depth_used_for_control": False,
+  "ik_type": "geometric_approximation",
 }
 open("/out/joint-verification.json","w").write(json.dumps(out, indent=2)+"\n")
 print(out)
 n.destroy_node(); rclpy.shutdown()
 PY
 
-# Cleanup launch
+# Cleanup launch without broad pkill (avoids killing the container bash / SIGTERM 15)
 kill $LPID 2>/dev/null || true
-sleep 2
-pkill -f franka_teleop || true
-pkill -f robot_state_publisher || true
+wait $LPID 2>/dev/null || true
+sleep 1
+# Best-effort node teardown by exact executable name only
+for p in mock_landmark_publisher human_to_robot_mapper safety_monitor \
+         robot_controller target_visualizer diagnostics robot_state_publisher rviz2; do
+  pkill -x "$p" 2>/dev/null || true
+done
+sleep 1
+true
 '
+
+# Ensure copy runs even if container reported a non-zero from background teardown
+set +e
 
 # Copy lightweight results into git tree
 cp -f "$OUT"/*.json "$RESULTS/" 2>/dev/null || true

@@ -1,0 +1,56 @@
+{
+  "simulation_job_id": 459319,
+  "recording_job_id": 459324,
+  "recording_job_state": "COMPLETED",
+  "build": "2 packages OK",
+  "pytest_ros2_package": "14 passed",
+  "topic_rates_hz": {
+    "target_pose": 19.997,
+    "command_pose": 19.954,
+    "joint_states": 19.975,
+    "safety_status": 19.997
+  },
+  "joint_verification_12s": {
+    "joint_samples": 212,
+    "joint_travel_rad": 4.374024973349193,
+    "joint_path_travel_rad": 4.374024973349193,
+    "joint_start_end_travel_rad": 0.5755326722998086,
+    "max_single_joint_excursion_rad": 0.8407093592422357,
+    "joints_moved": true,
+    "command_pose_count": 213,
+    "target_pose_count": 213,
+    "safety_status_samples": 213,
+    "unexpected_safety_flags": [],
+    "simulation_backend": "RViz 2 fake-hardware / joint_state simulation",
+    "physical_hardware": false,
+    "depth_used_for_control": false,
+    "ik_type": "geometric_approximation"
+  },
+  "recording_diagnostics": {
+    "elapsed_sec": 33.007179737091064,
+    "joint_path_travel_rad": 18.0289057779269,
+    "max_single_joint_excursion_rad": 1.0183587432483758,
+    "topic_rates_hz": {
+      "target_pose": 20.026,
+      "command_pose": 19.935,
+      "joint_states": 19.965,
+      "safety_status": 19.935
+    }
+  },
+  "physical_hardware": false,
+  "depth_used_for_control": false,
+  "ik_type": "geometric_approximation",
+  "demo_assets": [
+    "docs/demo/ros2-franka-teleoperation-v2.mp4",
+    "docs/demo/ros2-franka-teleoperation-v2.gif",
+    "docs/demo/ros2-franka-thumbnail-v2.png",
+    "docs/demo/ros2-franka-contact-sheet-v2.png"
+  ],
+  "labels": {
+    "backend": "RViz 2 fake hardware",
+    "physical_franka": false,
+    "mock_landmark_input": true,
+    "depth_used_for_control": false,
+    "ik": "geometric approximation"
+  }
+}

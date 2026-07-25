@@ -6,45 +6,70 @@ Panels:
 Visualization Manager:
   Class: ""
   Displays:
-    - Class: rviz_default_plugins/Grid
-      Name: Grid
-      Enabled: true
+    - Alpha: 0.35
       Cell Size: 0.1
-      Plane Cell Count: 20
-      Reference Frame: <Fixed Frame>
+      Class: rviz_default_plugins/Grid
+      Color: 120; 120; 128
+      Enabled: true
       Line Style:
-        Line Width: 0.03
+        Line Width: 0.02
         Value: Lines
-      Color: 160; 160; 164
-      Alpha: 0.5
-    - Class: rviz_default_plugins/RobotModel
-      Name: RobotModel
-      Enabled: true
-      Description Topic:
-        Value: /robot_description
-      Visual Enabled: true
+      Name: Grid
+      Normal Cell Count: 0
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Plane: XY
+      Plane Cell Count: 24
+      Reference Frame: <Fixed Frame>
+      Value: true
+    - Alpha: 1
+      Class: rviz_default_plugins/RobotModel
       Collision Enabled: false
-      Alpha: 1
+      Description Source: Topic
+      Description Topic:
+        Depth: 5
+        Durability Policy: Transient Local
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /robot_description
+      Enabled: true
+      Name: RobotModel
+      Visual Enabled: true
+      Value: true
     - Class: rviz_default_plugins/TF
+      Enabled: false
       Name: TF
-      Enabled: true
       Show Names: false
-      Marker Scale: 0.3
-    - Class: rviz_default_plugins/Marker
+      Marker Scale: 0.25
+      Value: false
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
       Name: TeleopMarkers
-      Enabled: true
       Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
         Value: /teleop/markers
-    - Class: rviz_default_plugins/Pose
-      Name: CommandPose
-      Enabled: true
-      Topic:
-        Value: /teleop/command_pose
-      Shape: Axes
-      Axes Length: 0.08
+      Value: true
+    - Axes Length: 0.08
       Axes Radius: 0.008
+      Class: rviz_default_plugins/Pose
+      Enabled: true
+      Name: CommandPose
+      Shape: Axes
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /teleop/command_pose
+      Value: true
+  Enabled: true
   Global Options:
-    Background Color: 48; 48; 48
+    Background Color: 36; 40; 48
     Fixed Frame: panda_link0
     Frame Rate: 30
   Name: root
@@ -52,19 +77,41 @@ Visualization Manager:
     - Class: rviz_default_plugins/Interact
     - Class: rviz_default_plugins/MoveCamera
     - Class: rviz_default_plugins/Select
+  Transformation:
+    Current:
+      Class: rviz_default_plugins/TF
   Value: true
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 1.8
+      Distance: 2.15
+      Enable Stereo Rendering:
+        Stereo Eye Separation: 0.06
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
+        Value: false
       Focal Point:
-        X: 0.3
-        Y: 0
-        Z: 0.35
+        X: 0.32
+        Y: 0.02
+        Z: 0.36
+      Focal Shape Fixed Size: true
+      Focal Shape Size: 0.05
+      Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.45
-      Yaw: 0.9
+      Pitch: 0.48
+      Target Frame: <Fixed Frame>
+      Value: Orbit (rviz_default_plugins)
+      Yaw: 0.95
+    Saved: ~
 Window Geometry:
-  Height: 800
-  Width: 1200
+  Displays:
+    collapsed: true
+  Height: 720
+  Hide Left Dock: true
+  Hide Right Dock: true
+  Views:
+    collapsed: true
+  Width: 1280
+  X: 0
+  Y: 0

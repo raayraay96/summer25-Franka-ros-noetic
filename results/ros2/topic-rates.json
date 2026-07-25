@@ -1,7 +1,11 @@
 {
-  "target_pose_hz": 20.0,
-  "command_pose_hz": 20.0,
-  "joint_states_hz": 19.7,
-  "source_job": "459315",
-  "notes": "Measured via in-node diagnostics and ros2 topic hz during mock_pipeline.launch.py"
+  "job_id": "459319",
+  "topic_rates_hz": {
+    "target_pose": 19.997,
+    "command_pose": 19.954,
+    "joint_states": 19.975,
+    "safety_status": 19.997
+  },
+  "window_sec": 46.00639581680298,
+  "source": "diagnostics"
 }

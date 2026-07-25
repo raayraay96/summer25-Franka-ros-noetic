@@ -10,27 +10,31 @@ Developed during the **HUMANS MOVE Program** at the University of Wyoming; portf
 
 ## ROS 2 Simulation Demo
 
-![ROS 2 Franka Panda simulation](docs/demo/ros2-franka-teleoperation.gif)
+![ROS 2 Franka Panda simulation](docs/demo/ros2-franka-teleoperation-v2.gif)
 
-[Full MP4 demonstration](docs/demo/ros2-franka-teleoperation.mp4)
+[Full MP4 demonstration](docs/demo/ros2-franka-teleoperation-v2.mp4) · [Contact sheet](docs/demo/ros2-franka-contact-sheet-v2.png)
 
 **Demo type:** ROS 2 MoveIt-capable stack / **RViz 2 fake-hardware simulation** on Purdue Scholar  
 **Hardware:** No physical Franka connected  
-**Input:** Smooth mock human-landmark trajectory  
-**Controller:** Geometric IK → `/joint_states` + `robot_state_publisher` (not Gazebo; not physical hardware)  
-**Depth:** Visualization-only — not used for control (shoulder-relative EE teleop)
+**Input:** Smooth **mock landmark** trajectory (explicitly labeled in the video)  
+**Controller:** Geometric IK approximation → `/joint_states` + `robot_state_publisher` (not Gazebo; not physical hardware)  
+**Depth:** Not used for control (shoulder-relative EE teleop)
 
 Reproduction and evidence: [`docs/ros2-simulation.md`](docs/ros2-simulation.md) · [`scholar/ROS2_SIMULATION.md`](scholar/ROS2_SIMULATION.md) · [`results/ros2/`](results/ros2/)
 
-### Verified pipeline metrics (Scholar job 459315)
+### Verified pipeline metrics (Scholar jobs 459319 sim / 459324 record)
 
 | Check | Result |
 |-------|--------|
 | `colcon build` | 2 packages OK |
-| Target / command pose rate | ~20 Hz |
-| Joint states rate | ~19.7 Hz |
-| Joint travel during demo window | ~0.92 rad (moved) |
+| Unit tests | 14 ROS 2 package tests passed |
+| Target / command / joint / safety rates | ~20 Hz |
+| Joint path travel (12 s verification window) | **4.37 rad** |
+| Max single-joint excursion | **0.84 rad** (sim) / **1.02 rad** (record) |
+| Unexpected e-stop / timeout / joint-limit flags | none |
 | Physical hardware | **false** |
+| Depth used for control | **false** |
+| IK type | geometric approximation |
 
 ## 1. Additional demos / research artifacts
 

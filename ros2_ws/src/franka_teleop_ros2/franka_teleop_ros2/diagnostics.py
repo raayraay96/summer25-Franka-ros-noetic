@@ -54,20 +54,39 @@ class Diagnostics(Node):
             return
         rates = {k: v / elapsed for k, v in self.counts.items()}
         moved = False
-        travel = 0.0
+        # Path-length travel (sum of |Δq| between consecutive samples).
+        # Prefer this over start-to-end, which under-reports cyclic demos.
+        path_travel = 0.0
+        start_end_travel = 0.0
+        max_joint_excursion = 0.0
         if len(self.joint_samples) >= 2:
-            a = self.joint_samples[0]
-            b = self.joint_samples[-1]
-            travel = sum(abs(bi - ai) for ai, bi in zip(a, b))
-            moved = travel > 0.05
+            for a, b in zip(self.joint_samples, self.joint_samples[1:]):
+                path_travel += sum(abs(bi - ai) for ai, bi in zip(a, b))
+            a0 = self.joint_samples[0]
+            b0 = self.joint_samples[-1]
+            start_end_travel = sum(abs(bi - ai) for ai, bi in zip(a0, b0))
+            n_j = len(self.joint_samples[0])
+            for j in range(n_j):
+                series = [s[j] for s in self.joint_samples if len(s) > j]
+                if series:
+                    max_joint_excursion = max(
+                        max_joint_excursion, max(series) - min(series)
+                    )
+            moved = path_travel > 0.05
+        travel = path_travel
         report = {
             "elapsed_sec": elapsed,
             "topic_rates_hz": rates,
             "joint_state_travel_rad": travel,
+            "joint_state_path_travel_rad": path_travel,
+            "joint_state_start_end_travel_rad": start_end_travel,
+            "max_single_joint_excursion_rad": max_joint_excursion,
             "joints_moved": moved,
             "n_joint_samples": len(self.joint_samples),
             "simulation_label": "RViz 2 fake-hardware / joint_state simulation",
             "physical_hardware": False,
+            "depth_used_for_control": False,
+            "ik_type": "geometric_approximation",
         }
         self.get_logger().info(json.dumps(report))
         out = str(self.get_parameter("output_json").value)

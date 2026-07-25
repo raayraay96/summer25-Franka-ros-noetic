@@ -85,8 +85,12 @@ results/ros2/test-summary.txt
 results/ros2/environment.json
 results/ros2/joint-verification.json
 results/ros2/simulation-metrics.json
-docs/demo/ros2-franka-teleoperation.gif
-docs/demo/ros2-franka-teleoperation.mp4
+docs/demo/ros2-franka-teleoperation-v2.gif
+docs/demo/ros2-franka-teleoperation-v2.mp4
+docs/demo/ros2-franka-contact-sheet-v2.png
+docs/demo/ros2-franka-thumbnail-v2.png
 ```
 
 Raw video (not in Git): `$RCAC_SCRATCH/franka-teleop-data/raw_video/`
+
+Verified Scholar jobs (v2): simulation **459319**, recording **459324**.

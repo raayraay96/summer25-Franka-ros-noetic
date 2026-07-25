@@ -1,4 +1,2 @@
-pytest franka_teleop_ros2: 10 passed (job 459315 / container humble)
-colcon build: franka_teleop_ros2 + franka_teleop_bringup OK
-Pipeline verification job: 459315 COMPLETED
-Record job: 459316 COMPLETED
+..............                                                           [100%]
+14 passed in 0.21s

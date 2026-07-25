@@ -19,7 +19,7 @@ from sensor_msgs.msg import JointState
 from std_msgs.msg import Bool, String
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
-from franka_teleop_ros2.ik_utils import panda_geometric_ik
+from franka_teleop_ros2.ik_utils import panda_geometric_fk, panda_geometric_ik
 
 # Panda joint names (ros2_control / moveit convention)
 PANDA_JOINTS = [
@@ -44,6 +44,8 @@ class RobotController(Node):
         self.declare_parameter("trajectory_time_sec", 0.35)
         self.declare_parameter("publish_joint_states_fallback", True)
         self.declare_parameter("joint_states_topic", "/joint_states")
+        self.declare_parameter("ee_pose_topic", "/teleop/ee_pose")
+        self.declare_parameter("base_frame", "panda_link0")
 
         self.mode = str(self.get_parameter("mode").value)
         allow_real = bool(self.get_parameter("allow_real_robot").value)
@@ -51,8 +53,10 @@ class RobotController(Node):
             self.get_logger().error("allow_real_robot=true is not supported; forcing simulation")
             allow_real = False
         self.traj_dt = float(self.get_parameter("trajectory_time_sec").value)
+        self.base_frame = str(self.get_parameter("base_frame").value)
         self.cancelled = False
         self._last_joints = [0.0, -0.4, 0.0, -2.0, 0.0, 1.8, 0.8]
+        self._last_ee_xyz = [0.40, 0.0, 0.45]
         self._ee_positions = []
 
         self.traj_pub = self.create_publisher(
@@ -60,6 +64,9 @@ class RobotController(Node):
         )
         self.status_pub = self.create_publisher(
             String, str(self.get_parameter("status_topic").value), 10
+        )
+        self.ee_pub = self.create_publisher(
+            PoseStamped, str(self.get_parameter("ee_pose_topic").value), 10
         )
         self.js_pub = None
         if bool(self.get_parameter("publish_joint_states_fallback").value):
@@ -117,13 +124,17 @@ class RobotController(Node):
             self.status_pub.publish(s)
             return
 
-        # Smooth blend toward solution
-        alpha = 0.35
+        # Smooth blend toward solution (higher alpha = more responsive demo motion)
+        alpha = 0.55
         blended = [
             (1 - alpha) * a + alpha * b for a, b in zip(self._last_joints, q)
         ]
         self._last_joints = blended
-        self._ee_positions.append([x, y, z])
+        # EE marker uses geometric FK of the blended joints so it sits on the
+        # visual arm tip (command sphere may lag slightly due to filtering).
+        fx, fy, fz = panda_geometric_fk(blended)
+        self._last_ee_xyz = [float(fx), float(fy), float(fz)]
+        self._ee_positions.append(self._last_ee_xyz[:])
         if len(self._ee_positions) > 500:
             self._ee_positions = self._ee_positions[-500:]
 
@@ -137,6 +148,15 @@ class RobotController(Node):
         traj.points = [pt]
         traj.header.stamp = self.get_clock().now().to_msg()
         self.traj_pub.publish(traj)
+
+        ee = PoseStamped()
+        ee.header.stamp = self.get_clock().now().to_msg()
+        ee.header.frame_id = self.base_frame
+        ee.pose.position.x = self._last_ee_xyz[0]
+        ee.pose.position.y = self._last_ee_xyz[1]
+        ee.pose.position.z = self._last_ee_xyz[2]
+        ee.pose.orientation.w = 1.0
+        self.ee_pub.publish(ee)
 
         s = String()
         s.data = f"commanded:[{x:.3f},{y:.3f},{z:.3f}]"

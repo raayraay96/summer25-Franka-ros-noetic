@@ -1,14 +1,19 @@
 {
-  "elapsed_sec": 32.00748562812805,
+  "elapsed_sec": 46.00639581680298,
   "topic_rates_hz": {
-    "target_pose": 19.99532257659035,
-    "command_pose": 19.96407988506443,
-    "joint_states": 19.96407988506443,
-    "safety_status": 19.96407988506443
+    "target_pose": 19.99721959667154,
+    "command_pose": 19.953747380157036,
+    "joint_states": 19.975483488414287,
+    "safety_status": 19.99721959667154
   },
-  "joint_state_travel_rad": 2.2953228459029438,
+  "joint_state_travel_rad": 20.880113234638372,
+  "joint_state_path_travel_rad": 20.880113234638372,
+  "joint_state_start_end_travel_rad": 2.1613887038513995,
+  "max_single_joint_excursion_rad": 0.9964021759663382,
   "joints_moved": true,
-  "n_joint_samples": 639,
+  "n_joint_samples": 919,
   "simulation_label": "RViz 2 fake-hardware / joint_state simulation",
-  "physical_hardware": false
+  "physical_hardware": false,
+  "depth_used_for_control": false,
+  "ik_type": "geometric_approximation"
 }

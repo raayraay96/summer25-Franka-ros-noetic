@@ -5,7 +5,14 @@ mock_landmark_publisher:
     image_width: 640
     image_height: 480
     topic: "/perception/landmarks"
-    motion_scale: 0.14
+    image_topic: "/perception/mock_landmarks_image"
+    # Larger motion for recruiter-visible shoulder/elbow/wrist travel.
+    # Lissajous period matches demo loop (~12 s).
+    motion_scale: 0.22
+    period_sec: 12.0
+    publish_image: true
+    panel_width: 320
+    panel_height: 240
 
 human_to_robot_mapper:
   ros__parameters:
@@ -17,10 +24,10 @@ human_to_robot_mapper:
     # Depth is visualization-only; not used for control in this demo.
     use_metric_depth: false
     base_frame: "panda_link0"
-    workspace_origin: [0.40, 0.0, 0.45]
-    workspace_scale: [0.45, 0.50, 0.30]
-    filter_alpha: 0.35
-    max_linear_velocity: 0.25
+    workspace_origin: [0.45, 0.0, 0.40]
+    workspace_scale: [0.55, 0.60, 0.40]
+    filter_alpha: 0.45
+    max_linear_velocity: 0.40
     workspace.x_min: 0.25
     workspace.x_max: 0.70
     workspace.y_min: -0.35
@@ -50,7 +57,7 @@ safety_monitor:
     workspace.y_max: 0.35
     workspace.z_min: 0.10
     workspace.z_max: 0.70
-    max_linear_velocity: 0.25
+    max_linear_velocity: 0.40
 
 robot_controller:
   ros__parameters:
@@ -58,8 +65,10 @@ robot_controller:
     input_topic: "/teleop/command_pose"
     trajectory_topic: "/panda_arm_controller/joint_trajectory"
     status_topic: "/teleop/controller_status"
+    ee_pose_topic: "/teleop/ee_pose"
+    base_frame: "panda_link0"
     allow_real_robot: false
-    trajectory_time_sec: 0.30
+    trajectory_time_sec: 0.25
     publish_joint_states_fallback: true
     joint_states_topic: "/joint_states"
 
@@ -67,9 +76,20 @@ target_visualizer:
   ros__parameters:
     target_topic: "/teleop/target_pose"
     command_topic: "/teleop/command_pose"
+    ee_topic: "/teleop/ee_pose"
     marker_topic: "/teleop/markers"
+    trail_length: 100
+    base_frame: "panda_link0"
+    sphere_scale: 0.05
+    show_workspace: true
+    workspace.x_min: 0.25
+    workspace.x_max: 0.70
+    workspace.y_min: -0.35
+    workspace.y_max: 0.35
+    workspace.z_min: 0.10
+    workspace.z_max: 0.70
 
 diagnostics:
   ros__parameters:
-    window_sec: 6.0
+    window_sec: 8.0
     output_json: ""
