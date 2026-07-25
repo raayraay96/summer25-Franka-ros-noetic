@@ -1,0 +1,10 @@
+# Private parameters for robot_controller_node.py
+mode: "dry_run"
+use_robot: false
+allow_real_robot: false
+use_moveit: true
+move_group: "panda_arm"
+planning_time: 1.0
+max_velocity_scaling: 0.2
+max_acceleration_scaling: 0.2
+input_topic: "/teleop/command_pose"
