@@ -2,7 +2,7 @@ name: lint
 
 on:
   push:
-    branches: [main, portfolio-v2]
+    branches: [main, portfolio-v2, portfolio-polish]
   pull_request:
     branches: [main, portfolio-v2]
 
@@ -27,7 +27,7 @@ jobs:
       - name: Parse YAML configs
         run: |
           python - <<'PY'
-          import sys, yaml
+          import yaml
           from pathlib import Path
           paths = list(Path("src/vision_arm_control/config").glob("*.yaml"))
           assert paths, "no yaml configs"
@@ -70,4 +70,25 @@ jobs:
           assert entries == ["vision_arm_control"], f"unexpected src entries: {entries}"
           print("src/ clean:", entries)
           assert not Path(".gitmodules").exists(), ".gitmodules present but submodules are intentionally not used"
+          PY
+      - name: Guard no binary weights in working tree
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          forbidden_ext = {".pth", ".pt", ".onnx", ".bag"}
+          bad = []
+          for p in Path(".").rglob("*"):
+              if ".git" in p.parts:
+                  continue
+              if p.is_file() and p.suffix.lower() in forbidden_ext:
+                  bad.append(str(p))
+          if bad:
+              raise SystemExit(f"Forbidden binary artifacts present: {bad}")
+          # Explicit weights/ directory must not hold tracked model files
+          weights = Path("src/vision_arm_control/weights")
+          if weights.is_dir():
+              model_files = [str(p) for p in weights.rglob("*") if p.is_file() and p.suffix.lower() in forbidden_ext]
+              if model_files:
+                  raise SystemExit(f"weights/ still contains models: {model_files}")
+          print("no binary weights/bags in working tree")
           PY

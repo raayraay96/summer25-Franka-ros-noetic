@@ -2,7 +2,7 @@ name: test
 
 on:
   push:
-    branches: [main, portfolio-v2]
+    branches: [main, portfolio-v2, portfolio-polish]
   pull_request:
     branches: [main, portfolio-v2]
 
