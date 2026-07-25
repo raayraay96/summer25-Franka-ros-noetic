@@ -1,0 +1,19 @@
+# Private parameters for safety_monitor_node.py
+input_topic: "/human_to_robot_mapper_node/target_pose"
+output_topic: "/teleop/command_pose"
+control_mode: "dry_run"
+allow_real_robot: false
+require_deadman: true
+workspace_mode: "reject"
+workspace:
+  x_min: 0.25
+  x_max: 0.75
+  y_min: -0.40
+  y_max: 0.40
+  z_min: 0.05
+  z_max: 0.80
+max_linear_velocity: 0.20
+max_joint_velocity: 1.0
+max_command_hz: 30.0
+pose_timeout_sec: 0.5
+command_stale_sec: 0.2
