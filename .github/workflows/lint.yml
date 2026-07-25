@@ -2,12 +2,12 @@ name: lint
 
 on:
   push:
-    branches: [main, portfolio-v2]
+    branches: [main, portfolio-v2, ros2-sim-demo]
   pull_request:
     branches: [main, portfolio-v2]
 
 jobs:
-  python-syntax-and-yaml:
+  python-syntax-and-config:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,42 +21,62 @@ jobs:
           python -m compileall -q \
             src/vision_arm_control/src \
             src/vision_arm_control/scripts \
+            ros2_ws/src/franka_teleop_ros2 \
+            ros2_ws/src/franka_teleop_bringup \
             tests \
             benchmarks \
             scripts
       - name: Parse YAML configs
         run: |
           python - <<'PY'
-          import sys, yaml
+          import yaml
           from pathlib import Path
-          paths = list(Path("src/vision_arm_control/config").glob("*.yaml"))
-          assert paths, "no yaml configs"
-          for p in paths:
-              yaml.safe_load(p.read_text())
-              print("ok", p)
+
+          roots = [
+              Path("src/vision_arm_control/config"),
+              Path("ros2_ws/src/franka_teleop_ros2/config"),
+          ]
+          paths = [path for root in roots for path in root.glob("*.yaml")]
+          assert paths, "no YAML configs"
+          for path in paths:
+              yaml.safe_load(path.read_text())
+              print("ok", path)
           PY
-      - name: Parse launch XML
+      - name: Parse ROS 1 launch XML
         run: |
           python - <<'PY'
           import xml.etree.ElementTree as ET
           from pathlib import Path
-          for p in Path("src/vision_arm_control/launch").glob("*.launch"):
-              root = ET.parse(p).getroot()
-              assert root.tag == "launch", p
-              print("ok", p)
+
+          for path in Path("src/vision_arm_control/launch").glob("*.launch"):
+              root = ET.parse(path).getroot()
+              assert root.tag == "launch", path
+              print("ok", path)
           PY
-      - name: Guard against personal paths
+      - name: Compile ROS 2 Python launch files
         run: |
-          # Active code/config only (audit docs may mention historical paths)
+          python -m py_compile ros2_ws/src/franka_teleop_bringup/launch/*.launch.py
+      - name: Guard against personal paths and placeholder metadata
+        run: |
           if grep -RIn --exclude-dir=.git \
-              --include='*.py' --include='*.yaml' --include='*.launch' --include='*.xml' --include='*.txt' --include='*.cmake' \
-              '/home/edr' src scripts docker scholar tests 2>/dev/null ; then
+              --include='*.py' --include='*.yaml' --include='*.launch' \
+              --include='*.xml' --include='*.txt' --include='*.cmake' \
+              '/home/edr' src ros2_ws scripts docker scholar tests 2>/dev/null ; then
             echo "Found forbidden personal absolute paths in active code" >&2
             exit 1
           fi
           if grep -RIn 'your_email@example.com\|Your Name\|yourusername' \
               src/vision_arm_control/package.xml src/vision_arm_control/CMakeLists.txt \
-              src/vision_arm_control/config src/vision_arm_control/launch 2>/dev/null ; then
+              src/vision_arm_control/config src/vision_arm_control/launch \
+              ros2_ws/src 2>/dev/null ; then
             echo "Found placeholder metadata" >&2
+            exit 1
+          fi
+      - name: Guard repository artifact sizes
+        run: |
+          oversized=$(find . -type f -size +25M -not -path './.git/*' -print)
+          if [ -n "$oversized" ]; then
+            echo "Files larger than 25 MB must stay outside Git:" >&2
+            echo "$oversized" >&2
             exit 1
           fi
