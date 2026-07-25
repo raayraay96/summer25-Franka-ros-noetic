@@ -1,0 +1,11 @@
+# Private parameters for camera_node.py
+image_topic: "/camera/color/image_raw/compressed"
+raw_image_topic: "/camera/color/image_raw"
+transport: "compressed"
+frame_id: "camera_optical_frame"
+device_index: 0
+width: 640
+height: 480
+fps: 15.0
+publish_raw: false
+log_every_n_frames: 30
