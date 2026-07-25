@@ -1,0 +1,20 @@
+{
+  "branch": "ros2-sim-demo",
+  "base": "portfolio-v2",
+  "simulation_backend": "RViz 2 fake-hardware / joint_state simulation",
+  "physical_hardware": false,
+  "depth_used_for_control": false,
+  "existing_scholar_simulation_verified": true,
+  "existing_demo_media_verified": true,
+  "post_hardening_ci_verified": true,
+  "post_hardening_scholar_rerun_completed": false,
+  "gazebo_verified": false,
+  "ros1_parameter_wiring": "implemented_and_static_tested",
+  "ros2_command_staleness": "implemented_and_unit_tested",
+  "ros2_pose_watchdog": "implemented_not_scholar_rerun",
+  "ros2_joint_limit_gate": "implemented_and_unit_tested",
+  "remaining_required_action": [
+    "sbatch scholar/run_ros2_simulation.slurm",
+    "sbatch scholar/record_ros2_demo.slurm"
+  ]
+}
