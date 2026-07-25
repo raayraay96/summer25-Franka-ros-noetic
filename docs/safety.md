@@ -43,3 +43,21 @@ Software safeguards in this repository are **assistive only**. They do not repla
 - Formal ISO safety certification
 - Guaranteed collision-free motion without MoveIt planning success
 - Replacement for manufacturer safety systems
+
+## Related documentation
+
+- Calibration / frames: [`docs/calibration.md`](calibration.md)
+- Model setup (weights outside Git): [`docs/model-setup.md`](model-setup.md)
+- History cleanup for large binaries: [`docs/history-cleanup.md`](history-cleanup.md)
+- Verified audit of pre-cleanup issues: [`docs/repository-audit.md`](repository-audit.md)
+
+## Config source of truth
+
+Runtime safety parameters live in:
+
+```text
+src/vision_arm_control/config/safety.yaml
+src/vision_arm_control/config/controller.yaml
+```
+
+Defaults must keep `allow_real_robot: false` and controller `mode: dry_run` until lab validation is documented with evidence.

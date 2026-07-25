@@ -55,3 +55,16 @@ Recommended methods:
 - Example intrinsics/extrinsics must not be presented as lab measurements.
 - MediaPipe `z` is not metric camera depth.
 - Without measured TF, shoulder-relative 2D mapping is the safer teleoperation mode.
+
+## Related documentation
+
+- Safety gates that consume mapped targets: [`docs/safety.md`](safety.md)
+- Model weights (not metric depth): [`docs/model-setup.md`](model-setup.md)
+- Repository audit (historical mapping issues): [`docs/repository-audit.md`](repository-audit.md)
+
+## After a real calibration session
+
+1. Update `camera_intrinsics.yaml` and set `status: measured`.
+2. Update `mapping.yaml` `frames.camera_to_base_status` to `measured` only with evidence.
+3. Document capture method, date, camera model, and residual error here.
+4. Only then consider updating README metrics away from “Not yet measured”.

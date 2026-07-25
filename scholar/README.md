@@ -25,16 +25,20 @@ export RCAC_SCRATCH=/scratch/scholar/$USER   # usually already set
 export FRANKA_MODEL_DIR=$RCAC_SCRATCH/franka-teleop-data/models
 ```
 
-## Submit jobs (GPU via SLURM)
+## Submit jobs (via SLURM)
+
+On Scholar, include a valid account (example: `scholar` for CPU partitions):
 
 ```bash
 cd $REPO_DIR
-sbatch scholar/run_benchmark.slurm
-sbatch scholar/run_perception.slurm
-sbatch scholar/generate_results.slurm
+sbatch --account=scholar scholar/run_benchmark.slurm
+sbatch --account=scholar scholar/run_perception.slurm   # GPU if configured in the script
+sbatch --account=scholar scholar/generate_results.slurm
 ```
 
 Do **not** run GPU workloads on the frontend/login node.
+
+GPU perception jobs require a GPU account/partition (for example `gpu` / `scholar-gpu`) if your site associations require it.
 
 ## What returns to GitHub
 

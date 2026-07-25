@@ -1,5 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=franka-results
+# Optional: #SBATCH --account=scholar   # set per site associations
 #SBATCH --output=%x-%j.out
 #SBATCH --error=%x-%j.err
 #SBATCH --time=00:20:00
