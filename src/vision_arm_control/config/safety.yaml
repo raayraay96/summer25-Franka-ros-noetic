@@ -1,0 +1,31 @@
+# Safety parameters
+#
+# Software safeguards do NOT replace official Franka safety procedures,
+# Desk configuration, FCI reflex behavior, or physical E-stop hardware.
+
+safety:
+  # Cartesian workspace bounds in robot base frame (meters)
+  workspace:
+    x_min: 0.25
+    x_max: 0.75
+    y_min: -0.40
+    y_max: 0.40
+    z_min: 0.05
+    z_max: 0.80
+  workspace_mode: "reject"  # reject | clamp
+
+  max_linear_velocity: 0.20   # m/s
+  max_joint_velocity: 1.0    # rad/s (software check only)
+  max_command_hz: 30.0
+
+  pose_timeout_sec: 0.5
+  command_stale_sec: 0.2
+
+  require_deadman: true
+  # Real robot motion requires BOTH use_robot:=true at launch AND this flag.
+  allow_real_robot: false
+
+  # Approximate Panda joint limits (rad) — controller is authoritative
+  joint_limits:
+    lower: [-2.8973, -1.7628, -2.8973, -3.0718, -2.8973, -0.0175, -2.8973]
+    upper: [2.8973, 1.7628, 2.8973, -0.0698, 2.8973, 3.7525, 2.8973]

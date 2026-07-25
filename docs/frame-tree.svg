@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="300" viewBox="0 0 640 300">
+  <rect width="100%" height="100%" fill="white"/>
+  <text x="320" y="28" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="16" font-weight="bold">Frame tree (conceptual)</text>
+  <text x="80" y="90" font-family="monospace" font-size="14">panda_link0 (base)</text>
+  <text x="100" y="120" font-family="monospace" font-size="14">└─ camera_optical_frame   [EXAMPLE static TF — calibrate]</text>
+  <text x="100" y="150" font-family="monospace" font-size="14">└─ panda_link1 … panda_link8 (robot model / MoveIt)</text>
+  <text x="80" y="210" font-family="Helvetica,Arial,sans-serif" font-size="12" fill="#444">
+    Normalized image coords are NOT base_link coordinates. Convert via intrinsics + extrinsics.
+  </text>
+</svg>

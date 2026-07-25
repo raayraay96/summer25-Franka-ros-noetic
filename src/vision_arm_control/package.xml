@@ -1,24 +1,34 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>vision_arm_control</name>
-  <version>0.0.0</version>
-  <description>The vision_arm_control package</description>
-  <maintainer email="your_email@example.com">Your Name</maintainer>
-  <license>TODO</license>
+  <version>0.2.0</version>
+  <description>
+    Vision-guided end-effector position teleoperation for a Franka Emika Panda
+    using ROS Noetic, MediaPipe pose estimation, and optional monocular depth.
+    Developed during the HUMANS MOVE Program at the University of Wyoming;
+    portfolio refactor on branch portfolio-v2.
+  </description>
+
+  <maintainer email="135032187+raayraay96@users.noreply.github.com">Eric Raymond</maintainer>
+  <author email="135032187+raayraay96@users.noreply.github.com">Eric Raymond</author>
+  <license>MIT</license>
+  <url type="website">https://github.com/raayraay96/summer25-Franka-ros-noetic</url>
+  <url type="bugtracker">https://github.com/raayraay96/summer25-Franka-ros-noetic/issues</url>
+
   <buildtool_depend>catkin</buildtool_depend>
+
   <depend>rospy</depend>
   <depend>std_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>geometry_msgs</depend>
-  <depend>franka_gazebo</depend>
-  <depend>panda_moveit_config</depend>
-  <depend>usb_cam</depend>
   <depend>cv_bridge</depend>
   <depend>image_transport</depend>
-  <exec_depend>python-numpy</exec_depend>
-  <exec_depend>python-opencv</exec_depend>
-  <exec_depend>python-mediapipe</exec_depend>
-  <exec_depend>python-ikpy</exec_depend>
+  <depend>tf</depend>
 
-  
+  <!-- Optional at runtime: only required for simulation/hardware stacks -->
+  <exec_depend>usb_cam</exec_depend>
+  <exec_depend>rosbag</exec_depend>
+
+  <export>
+  </export>
 </package>

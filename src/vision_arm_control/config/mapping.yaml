@@ -1,0 +1,29 @@
+# Human-to-robot mapping configuration
+#
+# Implemented mapping class:
+#   End-effector position teleoperation (not full upper-body retargeting)
+
+mapping:
+  mode: "shoulder_relative"  # shoulder_relative | image_plane_scaled
+  human_landmarks:
+    wrist: "right_wrist"
+    shoulder: "right_shoulder"
+  # Workspace origin and scale for shoulder-relative mode (meters / normalized)
+  workspace_origin: [0.45, 0.0, 0.45]
+  workspace_scale: [0.55, 0.55, 0.35]
+  # Relative monocular depth proxy (NOT metric unless calibrated)
+  use_metric_depth: false
+  relative_depth_scale: 1.0
+  relative_depth_offset: 0.8
+  min_landmark_confidence: 0.5
+
+frames:
+  camera_frame: "camera_optical_frame"
+  base_frame: "panda_link0"
+  # EXAMPLE static transform camera -> base (meters, xyz + rpy).
+  # STATUS: example — replace with measured extrinsic calibration.
+  camera_to_base_status: "example"
+  # Translation of camera in base frame
+  camera_in_base_xyz: [0.5, 0.0, 0.8]
+  # RPY of camera optical frame relative to base (radians)
+  camera_in_base_rpy: [3.14159, 0.0, 0.0]

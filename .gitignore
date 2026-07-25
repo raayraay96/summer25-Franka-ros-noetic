@@ -1,93 +1,72 @@
-# ROS specific
+# --- ROS build artifacts ---
 build/
 build_isolated/
 devel/
 devel_isolated/
+install/
 install_isolated/
 logs/
 .catkin_workspace
+.catkin_tools/
 
-# Bag files
+# --- Large / generated artifacts (keep out of Git) ---
+*.pth
+*.pt
+*.onnx
 *.bag
+*.mp4
+*.avi
+*.mkv
+*.npy
+*.npz
+weights/
+datasets/
+recordings/
+outputs/
+models/
+raw_video/
+rosbags/
 
-# Compiled Python files
-*.pyc
-
-# Python cache
+# --- Python ---
 __pycache__/
-
-# Temporary files
-*.swp
-*~
-
-# VS Code
-.vscode/
-
-# PyCharm
-.idea/
-
-# Eclipse
-.project
-.cproject
-.settings/
-
-# Custom directories
-Building/
-Processing/
-
-# Specific files
-Miniconda3-latest-Linux-x86_64.sh
-
-# OpenCV build
-opencv/build/
-
-# libfranka build
-libfranka/build/
-
-# Ignore all files in kitti_data
-kitti_data/*
-
-# Keep specific directories if needed
-# !kitti_data/important_subdirectory/
-
-# Ignore potential Python virtual environments
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
 venv/
 env/
 *.venv
 .env
 
-# Ignore potential Node.js dependencies
-node_modules/
-
-# Ignore potential CMake files
-CMakeCache.txt
-CMakeFiles/
-cmake_install.cmake
-Makefile
-
-# Ignore potential ROS generated files
-*.msg
-*.srv
-*Action.msg
-*ActionFeedback.msg
-*ActionGoal.msg
-*ActionResult.msg
+# --- IDE / OS ---
+.vscode/
+.idea/
+.DS_Store
+*.swp
 *~
 
-# Ignore potential C++ compiled files
-*.o
-*.so
-*.dylib
-
-# Ignore potential macOS specific files
-.DS_Store
-# Ignore nested repositories
+# --- Nested third-party checkouts (use system packages or documented clones) ---
 /libfranka/
 /opencv/
 /opencv_contrib/
-
-
-# Add any other project-specific files or directories you want to ignore/src/monodepth2/
-/src/trac_ik/
 /src/monodepth2/
 /src/trac_ik/
+/src/franka_ros/
+/src/franka_panda_description/
+/src/vision_opencv/
+
+# --- Accidental / local ---
+Building/
+Processing/
+Miniconda3-latest-Linux-x86_64.sh
+.qdrant-initialized
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+
+# Keep portfolio metrics; ignore huge dumps under results if any
+results/**/*.png.bak

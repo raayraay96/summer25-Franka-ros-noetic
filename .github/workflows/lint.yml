@@ -1,0 +1,62 @@
+name: lint
+
+on:
+  push:
+    branches: [main, portfolio-v2]
+  pull_request:
+    branches: [main, portfolio-v2]
+
+jobs:
+  python-syntax-and-yaml:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install tools
+        run: pip install PyYAML
+      - name: Python compileall
+        run: |
+          python -m compileall -q \
+            src/vision_arm_control/src \
+            src/vision_arm_control/scripts \
+            tests \
+            benchmarks \
+            scripts
+      - name: Parse YAML configs
+        run: |
+          python - <<'PY'
+          import sys, yaml
+          from pathlib import Path
+          paths = list(Path("src/vision_arm_control/config").glob("*.yaml"))
+          assert paths, "no yaml configs"
+          for p in paths:
+              yaml.safe_load(p.read_text())
+              print("ok", p)
+          PY
+      - name: Parse launch XML
+        run: |
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          for p in Path("src/vision_arm_control/launch").glob("*.launch"):
+              root = ET.parse(p).getroot()
+              assert root.tag == "launch", p
+              print("ok", p)
+          PY
+      - name: Guard against personal paths
+        run: |
+          # Active code/config only (audit docs may mention historical paths)
+          if grep -RIn --exclude-dir=.git \
+              --include='*.py' --include='*.yaml' --include='*.launch' --include='*.xml' --include='*.txt' --include='*.cmake' \
+              '/home/edr' src scripts docker scholar tests 2>/dev/null ; then
+            echo "Found forbidden personal absolute paths in active code" >&2
+            exit 1
+          fi
+          if grep -RIn 'your_email@example.com\|Your Name\|yourusername' \
+              src/vision_arm_control/package.xml src/vision_arm_control/CMakeLists.txt \
+              src/vision_arm_control/config src/vision_arm_control/launch 2>/dev/null ; then
+            echo "Found placeholder metadata" >&2
+            exit 1
+          fi
