@@ -1,29 +1,27 @@
 <launch>
-  <!-- Perception stack only: camera + pose (+ optional depth). No robot motion. -->
+  <!-- Perception stack only: camera + pose + optional relative depth. -->
   <arg name="use_camera" default="true"/>
   <arg name="enable_depth" default="true"/>
   <arg name="headless" default="true"/>
   <arg name="image_topic" default="/camera/color/image_raw/compressed"/>
   <arg name="model_dir" default=""/>
 
-  <rosparam file="$(find vision_arm_control)/config/camera.yaml" command="load"/>
-  <rosparam file="$(find vision_arm_control)/config/perception.yaml" command="load"/>
-  <rosparam file="$(find vision_arm_control)/config/models.yaml" command="load"/>
-
   <group if="$(arg use_camera)">
     <node pkg="vision_arm_control" type="camera_node.py" name="camera_node" output="screen">
+      <rosparam file="$(find vision_arm_control)/config/camera_node.yaml" command="load"/>
       <param name="image_topic" value="$(arg image_topic)"/>
-      <param name="headless" value="$(arg headless)"/>
     </node>
   </group>
 
   <node pkg="vision_arm_control" type="pose_estimator_node.py" name="pose_estimator_node" output="screen">
+    <rosparam file="$(find vision_arm_control)/config/pose_estimator_node.yaml" command="load"/>
     <param name="image_topic" value="$(arg image_topic)"/>
     <param name="headless" value="$(arg headless)"/>
     <param name="publish_visualization" value="true"/>
   </node>
 
   <node pkg="vision_arm_control" type="depth_estimator_node.py" name="depth_estimator_node" output="screen" if="$(arg enable_depth)">
+    <rosparam file="$(find vision_arm_control)/config/depth_estimator_node.yaml" command="load"/>
     <param name="image_topic" value="$(arg image_topic)"/>
     <param name="enabled" value="true"/>
     <param name="headless" value="$(arg headless)"/>
