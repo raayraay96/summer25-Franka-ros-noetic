@@ -8,14 +8,39 @@ Developed during the **HUMANS MOVE Program** at the University of Wyoming; portf
 
 ---
 
-## 1. Demo
+## ROS 2 Simulation Demo
+
+![ROS 2 Franka Panda simulation](docs/demo/ros2-franka-teleoperation.gif)
+
+[Full MP4 demonstration](docs/demo/ros2-franka-teleoperation.mp4)
+
+**Demo type:** ROS 2 MoveIt-capable stack / **RViz 2 fake-hardware simulation** on Purdue Scholar  
+**Hardware:** No physical Franka connected  
+**Input:** Smooth mock human-landmark trajectory  
+**Controller:** Geometric IK → `/joint_states` + `robot_state_publisher` (not Gazebo; not physical hardware)  
+**Depth:** Visualization-only — not used for control (shoulder-relative EE teleop)
+
+Reproduction and evidence: [`docs/ros2-simulation.md`](docs/ros2-simulation.md) · [`scholar/ROS2_SIMULATION.md`](scholar/ROS2_SIMULATION.md) · [`results/ros2/`](results/ros2/)
+
+### Verified pipeline metrics (Scholar job 459315)
+
+| Check | Result |
+|-------|--------|
+| `colcon build` | 2 packages OK |
+| Target / command pose rate | ~20 Hz |
+| Joint states rate | ~19.7 Hz |
+| Joint travel during demo window | ~0.92 rad (moved) |
+| Physical hardware | **false** |
+
+## 1. Additional demos / research artifacts
 
 | Asset | Label | Status |
 |-------|--------|--------|
-| Depth map screenshots (research period) | Perception-only demonstration | Available via historical README assets on GitHub |
-| Architecture diagram | Design documentation | [`docs/architecture.svg`](docs/architecture.svg) |
-| Physical Franka video | Real hardware | **Not yet published in this branch** |
-| Gazebo full-stack recording | Simulation | **Not yet measured / recorded here** |
+| ROS 2 simulation GIF/MP4 | RViz 2 fake-hardware simulation | [`docs/demo/`](docs/demo/) |
+| Depth map screenshots (research period) | Perception-only demonstration | Historical GitHub assets |
+| Architecture diagram | Design documentation | [`docs/architecture.svg`](docs/architecture.svg) · [`docs/ros2-architecture.svg`](docs/ros2-architecture.svg) |
+| Physical Franka video | Real hardware | **Not yet published** |
+| Gazebo full-stack recording | Gazebo simulation | **Not the verified Scholar demo path** |
 
 Historical depth visualizations from the research period (perception-only, not hardware proof):
 

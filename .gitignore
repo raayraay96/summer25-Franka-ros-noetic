@@ -70,3 +70,10 @@ cmake_install.cmake
 
 # Keep portfolio metrics; ignore huge dumps under results if any
 results/**/*.png.bak
+
+# Containers and local ROS 2 install artifacts
+*.sif
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/
+ros2-cache/
