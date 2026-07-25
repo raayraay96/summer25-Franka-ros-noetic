@@ -1,0 +1,10 @@
+{
+  "hostname": "scholar-a000.rcac.purdue.edu",
+  "slurm_job_id": "459315",
+  "ros_distro": "humble",
+  "container": "ros2_humble_franka.sif",
+  "simulation_backend": "RViz 2 fake-hardware / joint_state simulation",
+  "physical_hardware": false,
+  "date_utc": "2026-07-25T00:18:00Z",
+  "method": "Apptainer from scholar/ros2_humble.def (osrf/ros:humble-desktop + MoveIt2)"
+}

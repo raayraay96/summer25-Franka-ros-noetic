@@ -1,0 +1,24 @@
+header:
+  stamp:
+    sec: 1784938715
+    nanosec: 458270943
+  frame_id: ''
+name:
+- panda_joint1
+- panda_joint2
+- panda_joint3
+- panda_joint4
+- panda_joint5
+- panda_joint6
+- panda_joint7
+position:
+- 0.19275212746320347
+- -0.9104666637070854
+- 0.0
+- -1.7216254590543945
+- -0.4552333318535427
+- 1.585796326794897
+- 0.09637606373160174
+velocity: []
+effort: []
+---

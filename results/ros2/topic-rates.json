@@ -1,0 +1,7 @@
+{
+  "target_pose_hz": 20.0,
+  "command_pose_hz": 20.0,
+  "joint_states_hz": 19.7,
+  "source_job": "459315",
+  "notes": "Measured via in-node diagnostics and ros2 topic hz during mock_pipeline.launch.py"
+}

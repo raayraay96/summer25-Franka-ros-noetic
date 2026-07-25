@@ -1,0 +1,5 @@
+WARNING: topic [/teleop/target_pose] does not appear to be published yet
+average rate: 20.001
+	min: 0.050s max: 0.050s std dev: 0.00009s window: 22
+average rate: 20.001
+	min: 0.050s max: 0.050s std dev: 0.00010s window: 43

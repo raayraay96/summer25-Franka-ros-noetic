@@ -1,0 +1,14 @@
+{
+  "elapsed_sec": 32.00748562812805,
+  "topic_rates_hz": {
+    "target_pose": 19.99532257659035,
+    "command_pose": 19.96407988506443,
+    "joint_states": 19.96407988506443,
+    "safety_status": 19.96407988506443
+  },
+  "joint_state_travel_rad": 2.2953228459029438,
+  "joints_moved": true,
+  "n_joint_samples": 639,
+  "simulation_label": "RViz 2 fake-hardware / joint_state simulation",
+  "physical_hardware": false
+}
