@@ -60,3 +60,14 @@ jobs:
             echo "Found placeholder metadata" >&2
             exit 1
           fi
+      - name: Guard clean src/ layout
+        run: |
+          # Only the maintained package should live under src/
+          python - <<'PY'
+          from pathlib import Path
+          src = Path("src")
+          entries = sorted(p.name for p in src.iterdir() if p.name != ".git")
+          assert entries == ["vision_arm_control"], f"unexpected src entries: {entries}"
+          print("src/ clean:", entries)
+          assert not Path(".gitmodules").exists(), ".gitmodules present but submodules are intentionally not used"
+          PY
