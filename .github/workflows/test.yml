@@ -2,7 +2,7 @@ name: test
 
 on:
   push:
-    branches: [main, portfolio-v2]
+    branches: [main, portfolio-v2, ros2-sim-demo]
   pull_request:
     branches: [main, portfolio-v2]
 
@@ -18,10 +18,30 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install numpy pytest PyYAML
-      - name: Run unit tests
+      - name: Run ROS 1 pure unit tests
         run: |
           python -m pytest -q tests/
-      - name: Run mapping benchmark (smoke)
+      - name: Run ROS 2 pure unit tests
+        run: |
+          python -m pytest -q ros2_ws/src/franka_teleop_ros2/test/
+      - name: Run mapping benchmark smoke test
         run: |
           python benchmarks/benchmark_mapping.py
           test -f results/mapping_benchmark.json
+      - name: Verify safety defaults
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+
+          cfg = yaml.safe_load(
+              Path("ros2_ws/src/franka_teleop_ros2/config/teleop.yaml").read_text()
+          )
+          safety = cfg["safety_monitor"]["ros__parameters"]
+          controller = cfg["robot_controller"]["ros__parameters"]
+          assert safety["allow_real_robot"] is False
+          assert safety["control_mode"] == "simulation"
+          assert safety["command_stale_sec"] > 0
+          assert controller["allow_real_robot"] is False
+          print("ROS 2 safety defaults verified")
+          PY
