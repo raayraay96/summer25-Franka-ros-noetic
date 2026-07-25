@@ -1,7 +1,18 @@
 # Repository Audit — summer25-Franka-ros-noetic
 
+> **Post-merge status (2026-07-25)**  
+> This audit was written against pre-`portfolio-v2` `main` (`94933b3`).  
+> Branch `portfolio-v2` was merged into `main` and implements the recommended order in §14 (modular nodes, safety defaults, tests, CI, model hygiene, Scholar templates, honest limitations).  
+> Follow-up cleanup on `main` after the merge:  
+> - Removed machine-specific `src/CMakeLists.txt` symlink  
+> - Removed five empty gitlink entries (`franka_ros`, `franka_panda_description`, `monodepth2`, `trac_ik`, `vision_opencv`) that had no `.gitmodules`  
+> - Working tree under `src/` now contains only the maintained `vision_arm_control` package  
+> Large blobs remain in **Git history** only; see [`docs/history-cleanup.md`](history-cleanup.md) for authorized filter-repo procedure. Do not invent unmeasured hardware results.
+
+---
+
 **Audit date:** 2026-07-24  
-**Branch audited:** `main` @ `94933b3`  
+**Branch audited:** `main` @ `94933b3` (pre-portfolio-v2)  
 **Auditor method:** Full tree inspection, source review, Git object size analysis, path search.  
 **Truthfulness rule:** Findings are labeled `Verified`, `Likely`, `Unverified`, or `Blocked by unavailable hardware`.
 
