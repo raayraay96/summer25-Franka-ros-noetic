@@ -68,10 +68,23 @@ class SafetyMonitor:
     def note_pose(self, timestamp: float) -> None:
         self.pose_monitor.note_pose(timestamp)
 
+    def command_is_stale(self, command_timestamp: Optional[float], now: float) -> bool:
+        """Return True when a timestamped command is older than the configured limit.
+
+        A missing or zero timestamp is treated as unavailable rather than stale so the
+        pure mock pipeline remains usable. Real integrations should always stamp input
+        messages and can reject unstamped commands before this layer.
+        """
+        if command_timestamp is None or float(command_timestamp) <= 0.0:
+            return False
+        age = float(now) - float(command_timestamp)
+        return age > self.config.command_stale_sec
+
     def evaluate_position(
         self,
         position: Sequence[float],
         now: float,
+        command_timestamp: Optional[float] = None,
     ) -> SafetyDecision:
         if self.emergency_stop:
             return SafetyDecision(False, "emergency_stop", emergency_stop=True)
@@ -82,6 +95,9 @@ class SafetyMonitor:
         if self.config.require_deadman and self.control_mode == ControlMode.REAL_ROBOT:
             if not self.deadman_enabled:
                 return SafetyDecision(False, "deadman_not_enabled")
+
+        if self.command_is_stale(command_timestamp, now):
+            return SafetyDecision(False, "command_stale")
 
         if not self.pose_monitor.is_valid(now):
             return SafetyDecision(False, "pose_timeout")
