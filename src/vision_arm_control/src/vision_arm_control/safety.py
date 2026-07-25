@@ -27,7 +27,7 @@ class SafetyConfig:
     max_command_hz: float = 50.0
     pose_timeout_sec: float = 0.5
     command_stale_sec: float = 0.2
-    workspace_mode: str = "reject"  # reject | clamp
+    workspace_mode: str = "reject"
     require_deadman: bool = True
     allow_real_robot: bool = False
 
@@ -53,7 +53,6 @@ class SafetyMonitor:
     def __post_init__(self) -> None:
         self.pose_monitor = PoseTimeoutMonitor(timeout_sec=self.config.pose_timeout_sec)
         if self.control_mode == ControlMode.REAL_ROBOT and not self.config.allow_real_robot:
-            # Hard policy: real robot requires explicit allow flag in config/launch.
             self.control_mode = ControlMode.DRY_RUN
 
     def request_emergency_stop(self) -> None:
@@ -68,10 +67,16 @@ class SafetyMonitor:
     def note_pose(self, timestamp: float) -> None:
         self.pose_monitor.note_pose(timestamp)
 
+    def command_is_stale(self, command_timestamp: Optional[float], now: float) -> bool:
+        if command_timestamp is None or float(command_timestamp) <= 0.0:
+            return False
+        return (float(now) - float(command_timestamp)) > self.config.command_stale_sec
+
     def evaluate_position(
         self,
         position: Sequence[float],
         now: float,
+        command_timestamp: Optional[float] = None,
     ) -> SafetyDecision:
         if self.emergency_stop:
             return SafetyDecision(False, "emergency_stop", emergency_stop=True)
@@ -82,6 +87,9 @@ class SafetyMonitor:
         if self.config.require_deadman and self.control_mode == ControlMode.REAL_ROBOT:
             if not self.deadman_enabled:
                 return SafetyDecision(False, "deadman_not_enabled")
+
+        if self.command_is_stale(command_timestamp, now):
+            return SafetyDecision(False, "command_stale")
 
         if not self.pose_monitor.is_valid(now):
             return SafetyDecision(False, "pose_timeout")
