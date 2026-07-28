@@ -11,7 +11,7 @@
   <img src="docs/media/franka-rviz-dry-run.gif" alt="Mock wrist landmarks driving a Franka Panda end-effector target in RViz 2 fake-hardware simulation" width="820">
 </p>
 
-Built during the **HUMANS MOVE Program at the University of Wyoming**, then refactored from a research prototype into a modular, testable, safety-gated portfolio system. The verified hero demo uses mock landmarks and RViz 2 fake hardware on Purdue Scholar; it is not physical-robot proof.
+Developed initially during the **HUMANS MOVE Program at the University of Wyoming**. After the program concluded, Eric Raymond independently refactored the research prototype into a modular, testable, safety-gated portfolio system. The verified hero demo uses mock landmarks and RViz 2 fake hardware on Purdue Scholar; it is not physical-robot proof.
 
 ## Contents
 
@@ -168,8 +168,8 @@ The preserved audit in [`docs/repository-audit.md`](docs/repository-audit.md) re
 
 | Work | Contribution |
 |---|---|
-| HUMANS MOVE research prototype | Eric Raymond: perception experiments, ROS integration, teleoperation prototype, research artifacts |
-| Portfolio engineering | Eric Raymond: modular architecture, mapping/safety refactor, tests, benchmarks, docs, CI, containers, Scholar workflow |
+| HUMANS MOVE research prototype, Summer 2024 | Eric Raymond: perception experiments, ROS integration, teleoperation prototype, and research artifacts completed during the program |
+| Independent post-program portfolio engineering, 2026 | Eric Raymond: modular architecture, mapping/safety refactor, tests, benchmarks, documentation, CI, containers, and Purdue Scholar simulation workflow |
 | Third-party systems | MediaPipe by Google; MonoDepth2 by Niantic; ROS/MoveIt and Franka ecosystem packages by their maintainers |
 
 ## Citation
