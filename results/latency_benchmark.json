@@ -1,0 +1,13 @@
+{
+  "metric": "pipeline_cpu_stage_latency_ms",
+  "n": 2000,
+  "mean_ms": 0.029782603499370452,
+  "p50_ms": 0.02728549998209928,
+  "reject_rate": 0.0,
+  "hardware": "x86_64",
+  "os": "Linux-6.1.158-x86_64-with-glibc2.41",
+  "python": "3.13.13",
+  "date_utc": "2026-07-28T20:03:07.191375+00:00",
+  "command": "python benchmarks/benchmark_latency.py",
+  "notes": "CPU stages only (map+filter+workspace). Full ROS perception+control and physical Franka latency: Not yet measured."
+}

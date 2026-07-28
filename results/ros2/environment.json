@@ -1,0 +1,12 @@
+{
+  "hostname": "scholar-a000.rcac.purdue.edu",
+  "platform": "Linux-5.14.0-570.26.1.el9_6.x86_64-x86_64-with-glibc2.35",
+  "python": "3.10.12",
+  "date_utc": "2026-07-25T02:28:45.101350+00:00",
+  "slurm_job_id": "459328",
+  "ros_distro": "humble",
+  "container": "ros2_humble_franka.sif",
+  "simulation_backend": "RViz 2 fake-hardware / joint_state simulation",
+  "physical_hardware": false,
+  "ros2_pkg_moveit_panda": "/opt/ros/humble"
+}

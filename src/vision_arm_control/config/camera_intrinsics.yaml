@@ -1,0 +1,16 @@
+# Camera intrinsics
+#
+# STATUS: EXAMPLE VALUES — not measured calibration for a specific camera.
+# Replace after running a real calibration (see docs/calibration.md).
+
+camera_intrinsics:
+  status: "example"
+  width: 640
+  height: 480
+  fx: 600.0
+  fy: 600.0
+  cx: 320.0
+  cy: 240.0
+  # Brown-Conrady distortion (zeros = no distortion model applied)
+  distortion_model: "plumb_bob"
+  D: [0.0, 0.0, 0.0, 0.0, 0.0]

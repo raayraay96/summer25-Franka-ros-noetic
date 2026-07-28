@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+title: "Vision-Guided Franka Panda Teleoperation"
+type: software
+authors:
+  - family-names: Raymond
+    given-names: Eric
+repository-code: "https://github.com/raayraay96/summer25-Franka-ros-noetic"
+url: "https://github.com/raayraay96/summer25-Franka-ros-noetic"
+license: MIT
+version: 1.0.0
+date-released: 2026-07-28
+keywords:
+  - ROS
+  - Franka Panda
+  - teleoperation
+  - human-robot interaction
+  - MediaPipe
+  - relative depth
+  - robotics safety
+preferred-citation:
+  type: software
+  title: "Vision-Guided Franka Panda Teleoperation"
+  authors:
+    - family-names: Raymond
+      given-names: Eric
+  year: 2026
+  url: "https://github.com/raayraay96/summer25-Franka-ros-noetic"

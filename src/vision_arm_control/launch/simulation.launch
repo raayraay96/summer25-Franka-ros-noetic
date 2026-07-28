@@ -1,0 +1,46 @@
+<launch>
+  <!--
+    Simulation / mock demonstration path.
+    Does not start real Franka hardware.
+    Optionally include panda MoveIt + Gazebo if installed (see docs).
+  -->
+  <arg name="use_gazebo" default="false"/>
+  <arg name="use_moveit" default="false"/>
+  <arg name="use_mock_landmarks" default="true"/>
+  <arg name="headless" default="true"/>
+
+  <rosparam file="$(find vision_arm_control)/config/mapping.yaml" command="load"/>
+  <rosparam file="$(find vision_arm_control)/config/safety.yaml" command="load"/>
+  <rosparam file="$(find vision_arm_control)/config/controller.yaml" command="load"/>
+  <rosparam file="$(find vision_arm_control)/config/camera_intrinsics.yaml" command="load"/>
+
+  <!-- Optional external stacks — only when installed and requested -->
+  <group if="$(arg use_gazebo)">
+    <include file="$(find franka_gazebo)/launch/panda.launch" if="$(arg use_gazebo)">
+      <!-- May fail if franka_gazebo is not installed; keep use_gazebo:=false by default -->
+    </include>
+  </group>
+
+  <group if="$(arg use_moveit)">
+    <include file="$(find panda_moveit_config)/launch/demo.launch"/>
+  </group>
+
+  <node pkg="vision_arm_control" type="mock_landmark_publisher.py" name="mock_landmark_publisher" output="screen" if="$(arg use_mock_landmarks)"/>
+
+  <node pkg="vision_arm_control" type="human_to_robot_mapper_node.py" name="human_to_robot_mapper_node" output="screen">
+    <param name="mapping_mode" value="shoulder_relative"/>
+  </node>
+
+  <node pkg="vision_arm_control" type="safety_monitor_node.py" name="safety_monitor_node" output="screen">
+    <param name="control_mode" value="simulation"/>
+    <param name="allow_real_robot" value="false"/>
+    <param name="require_deadman" value="false"/>
+  </node>
+
+  <node pkg="vision_arm_control" type="robot_controller_node.py" name="robot_controller_node" output="screen">
+    <param name="mode" value="simulation"/>
+    <param name="use_robot" value="false"/>
+    <param name="allow_real_robot" value="false"/>
+    <param name="use_moveit" value="$(arg use_moveit)"/>
+  </node>
+</launch>

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>franka_teleop_bringup</name>
+  <version>0.2.0</version>
+  <description>Launch files for Franka teleop ROS 2 simulation on Scholar.</description>
+  <maintainer email="135032187+raayraay96@users.noreply.github.com">Eric Raymond</maintainer>
+  <license>MIT</license>
+
+  <depend>franka_teleop_ros2</depend>
+  <depend>robot_state_publisher</depend>
+  <depend>rviz2</depend>
+  <depend>xacro</depend>
+  <depend>moveit_resources_panda_description</depend>
+  <depend>launch</depend>
+  <depend>launch_ros</depend>
+  <depend>ament_index_python</depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

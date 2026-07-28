@@ -1,0 +1,19 @@
+{
+  "elapsed_sec": 30.006635189056396,
+  "topic_rates_hz": {
+    "target_pose": 19.995577518762374,
+    "command_pose": 19.962251556231102,
+    "joint_states": 19.962251556231102,
+    "safety_status": 19.995577518762374
+  },
+  "joint_state_travel_rad": 17.538080622254608,
+  "joint_state_path_travel_rad": 17.538080622254608,
+  "joint_state_start_end_travel_rad": 2.112874159670184,
+  "max_single_joint_excursion_rad": 1.0183587624341142,
+  "joints_moved": true,
+  "n_joint_samples": 599,
+  "simulation_label": "RViz 2 fake-hardware / joint_state simulation",
+  "physical_hardware": false,
+  "depth_used_for_control": false,
+  "ik_type": "geometric_approximation"
+}

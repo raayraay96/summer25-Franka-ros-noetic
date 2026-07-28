@@ -1,0 +1,7 @@
+{
+  "name": "Franka Teleoperation - ROS Noetic",
+  "build": {"dockerfile": "Dockerfile.noetic", "context": "."},
+  "workspaceFolder": "/workspaces/franka-teleop",
+  "remoteUser": "root",
+  "postCreateCommand": "bash -lc 'source /opt/ros/noetic/setup.bash && source /ws/devel/setup.bash && python3 -m pytest -q tests/'"
+}

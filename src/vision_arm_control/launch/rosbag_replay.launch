@@ -1,0 +1,21 @@
+<launch>
+  <!-- Replay a recorded bag into the perception pipeline. No robot motion. -->
+  <arg name="bag" default=""/>
+  <arg name="image_topic" default="/camera/color/image_raw/compressed"/>
+  <arg name="enable_depth" default="false"/>
+  <arg name="headless" default="true"/>
+  <arg name="model_dir" default=""/>
+
+  <param name="/use_sim_time" value="true"/>
+
+  <node pkg="rosbag" type="play" name="rosbag_play" output="screen"
+        args="--clock $(arg bag)" required="true" if="$(eval bag != '')"/>
+
+  <include file="$(find vision_arm_control)/launch/perception_only.launch">
+    <arg name="use_camera" value="false"/>
+    <arg name="enable_depth" value="$(arg enable_depth)"/>
+    <arg name="headless" value="$(arg headless)"/>
+    <arg name="image_topic" value="$(arg image_topic)"/>
+    <arg name="model_dir" value="$(arg model_dir)"/>
+  </include>
+</launch>

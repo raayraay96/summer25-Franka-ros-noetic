@@ -1,0 +1,26 @@
+# Perception parameters (pose + depth)
+
+pose:
+  min_detection_confidence: 0.5
+  min_tracking_confidence: 0.5
+  model_complexity: 1
+  publish_landmarks: true
+  publish_visualization: true
+  headless: true  # set false only when a display is available
+
+depth:
+  enabled: true
+  # MonoDepth2 monocular output is RELATIVE depth, not metric meters.
+  output_type: "relative"
+  input_width: 640
+  input_height: 192
+  processing_rate_hz: 10
+  # Model files resolved via FRANKA_MODEL_DIR or package weights/
+  encoder_filename: "encoder.pth"
+  depth_filename: "depth.pth"
+  # Visualization-only unless integrated with calibrated scale
+  publish_colormap: true
+
+processing:
+  # Reduce log spam in real-time callbacks
+  log_every_n_frames: 30

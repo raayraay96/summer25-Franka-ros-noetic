@@ -1,0 +1,87 @@
+# --- ROS build artifacts ---
+build/
+build_isolated/
+devel/
+devel_isolated/
+install/
+install_isolated/
+logs/
+.catkin_workspace
+.catkin_tools/
+
+# --- Large / generated artifacts (keep out of Git) ---
+*.pth
+*.pt
+*.onnx
+*.bag
+*.mp4
+*.avi
+*.mkv
+*.npy
+*.npz
+weights/
+datasets/
+recordings/
+outputs/
+models/
+raw_video/
+rosbags/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+*.venv
+.env
+
+# --- IDE / OS ---
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*~
+
+# --- Nested third-party checkouts (use system packages or documented clones) ---
+/libfranka/
+/opencv/
+/opencv_contrib/
+/src/monodepth2/
+/src/trac_ik/
+/src/franka_ros/
+/src/franka_panda_description/
+/src/vision_opencv/
+
+# --- Accidental / local ---
+Building/
+Processing/
+Miniconda3-latest-Linux-x86_64.sh
+.qdrant-initialized
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+
+# Keep portfolio metrics; ignore huge dumps under results if any
+results/**/*.png.bak
+
+# Containers and local ROS 2 install artifacts
+*.sif
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/
+ros2-cache/
+
+# Portfolio demo media is allowed (small compressed assets)
+!docs/media/
+!docs/media/**
+
+RCAC_SCRATCH/
+
+FRANKA_MODEL_DIR

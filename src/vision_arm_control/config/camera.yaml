@@ -1,0 +1,14 @@
+# Camera input configuration
+# No user-specific absolute paths.
+
+camera:
+  # Input topic for perception nodes
+  image_topic: "/camera/color/image_raw/compressed"
+  transport: "compressed"  # compressed | raw
+  frame_id: "camera_optical_frame"
+  # Local webcam fallback (camera_node only)
+  device_index: 0
+  width: 640
+  height: 480
+  fps: 15
+  publish_raw: false

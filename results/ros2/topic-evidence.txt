@@ -1,0 +1,33 @@
+=== nodes ===
+/diagnostics
+/human_to_robot_mapper
+/mock_landmark_publisher
+/robot_controller
+/robot_state_publisher
+/safety_monitor
+/target_visualizer
+=== topics ===
+/parameter_events
+/rosout
+=== target hz ===
+average rate: 20.001
+	min: 0.049s max: 0.051s std dev: 0.00019s window: 22
+average rate: 19.999
+	min: 0.049s max: 0.051s std dev: 0.00017s window: 42
+average rate: 20.001
+	min: 0.049s max: 0.051s std dev: 0.00015s window: 63
+=== command hz ===
+average rate: 20.002
+	min: 0.050s max: 0.050s std dev: 0.00015s window: 22
+average rate: 20.001
+	min: 0.050s max: 0.050s std dev: 0.00012s window: 42
+average rate: 20.000
+	min: 0.049s max: 0.051s std dev: 0.00019s window: 62
+=== joint_states hz ===
+WARNING: topic [/joint_states] does not appear to be published yet
+average rate: 20.001
+	min: 0.050s max: 0.050s std dev: 0.00006s window: 22
+average rate: 20.001
+	min: 0.050s max: 0.050s std dev: 0.00005s window: 43
+=== joint_states sample ===
+=== safety status ===

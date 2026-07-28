@@ -1,0 +1,95 @@
+# Parameters loaded under each node namespace via bringup launch.
+mock_landmark_publisher:
+  ros__parameters:
+    rate_hz: 20.0
+    image_width: 640
+    image_height: 480
+    topic: "/perception/landmarks"
+    image_topic: "/perception/mock_landmarks_image"
+    # Larger motion for recruiter-visible shoulder/elbow/wrist travel.
+    # Lissajous period matches demo loop (~12 s).
+    motion_scale: 0.22
+    period_sec: 12.0
+    publish_image: true
+    panel_width: 320
+    panel_height: 240
+
+human_to_robot_mapper:
+  ros__parameters:
+    landmarks_topic: "/perception/landmarks"
+    target_topic: "/teleop/target_pose"
+    rejected_topic: "/teleop/mapping_rejected"
+    mapping_mode: "shoulder_relative"
+    min_landmark_confidence: 0.5
+    # Depth is visualization-only; not used for control in this demo.
+    use_metric_depth: false
+    base_frame: "panda_link0"
+    workspace_origin: [0.45, 0.0, 0.40]
+    workspace_scale: [0.55, 0.60, 0.40]
+    filter_alpha: 0.45
+    max_linear_velocity: 0.40
+    workspace.x_min: 0.25
+    workspace.x_max: 0.70
+    workspace.y_min: -0.35
+    workspace.y_max: 0.35
+    workspace.z_min: 0.10
+    workspace.z_max: 0.70
+    fixed_orientation_rpy: [3.14159, 0.0, 0.0]
+    fx: 600.0
+    fy: 600.0
+    cx: 320.0
+    cy: 240.0
+
+safety_monitor:
+  ros__parameters:
+    input_topic: "/teleop/target_pose"
+    output_topic: "/teleop/command_pose"
+    status_topic: "/teleop/safety_status"
+    control_mode: "simulation"
+    allow_real_robot: false
+    require_deadman: false
+    max_command_hz: 30.0
+    pose_timeout_sec: 0.75
+    workspace_mode: "clamp"
+    workspace.x_min: 0.25
+    workspace.x_max: 0.70
+    workspace.y_min: -0.35
+    workspace.y_max: 0.35
+    workspace.z_min: 0.10
+    workspace.z_max: 0.70
+    max_linear_velocity: 0.40
+
+robot_controller:
+  ros__parameters:
+    mode: "joint_ik"
+    input_topic: "/teleop/command_pose"
+    trajectory_topic: "/panda_arm_controller/joint_trajectory"
+    status_topic: "/teleop/controller_status"
+    ee_pose_topic: "/teleop/ee_pose"
+    base_frame: "panda_link0"
+    allow_real_robot: false
+    trajectory_time_sec: 0.25
+    publish_joint_states_fallback: true
+    joint_states_topic: "/joint_states"
+
+target_visualizer:
+  ros__parameters:
+    target_topic: "/teleop/target_pose"
+    command_topic: "/teleop/command_pose"
+    ee_topic: "/teleop/ee_pose"
+    marker_topic: "/teleop/markers"
+    trail_length: 100
+    base_frame: "panda_link0"
+    sphere_scale: 0.05
+    show_workspace: true
+    workspace.x_min: 0.25
+    workspace.x_max: 0.70
+    workspace.y_min: -0.35
+    workspace.y_max: 0.35
+    workspace.z_min: 0.10
+    workspace.z_max: 0.70
+
+diagnostics:
+  ros__parameters:
+    window_sec: 8.0
+    output_json: ""

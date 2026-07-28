@@ -1,0 +1,11 @@
+{
+  "job_id": "459328",
+  "topic_rates_hz": {
+    "target_pose": 19.889,
+    "command_pose": 19.824,
+    "joint_states": 19.976,
+    "safety_status": 19.889
+  },
+  "window_sec": 46.005311012268066,
+  "source": "diagnostics"
+}

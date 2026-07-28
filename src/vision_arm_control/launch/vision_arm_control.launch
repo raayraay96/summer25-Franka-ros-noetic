@@ -1,0 +1,15 @@
+<launch>
+  <!--
+    Legacy entry point — now delegates to mimicry.launch in dry_run mode.
+    Prefer:
+      roslaunch vision_arm_control perception_only.launch
+      roslaunch vision_arm_control simulation.launch
+      roslaunch vision_arm_control mimicry.launch use_robot:=false
+  -->
+  <arg name="use_robot" default="false"/>
+  <include file="$(find vision_arm_control)/launch/mimicry.launch">
+    <arg name="use_robot" value="$(arg use_robot)"/>
+    <arg name="control_mode" value="dry_run"/>
+    <arg name="enable_depth" value="true"/>
+  </include>
+</launch>

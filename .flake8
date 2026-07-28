@@ -1,0 +1,8 @@
+[flake8]
+max-line-length = 110
+extend-ignore = E203,W503
+exclude = .git,build,devel,install,ros2_ws/build,ros2_ws/install,src/vision_arm_control/scripts/legacy,src/vision_arm_control/additions
+per-file-ignores =
+    __init__.py:F401
+    scripts/generate_diagrams.py:E501
+    scripts/generate_ros2_diagram.py:E501

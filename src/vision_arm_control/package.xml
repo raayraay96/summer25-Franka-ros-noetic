@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>vision_arm_control</name>
+  <version>0.2.0</version>
+  <description>
+    Vision-guided end-effector position teleoperation for a Franka Emika Panda
+    using ROS Noetic, MediaPipe pose estimation, and optional monocular depth.
+    Developed during the HUMANS MOVE Program at the University of Wyoming;
+    production-minded portfolio refactor with reproducible dry-run validation.
+  </description>
+
+  <maintainer email="135032187+raayraay96@users.noreply.github.com">Eric Raymond</maintainer>
+  <author email="135032187+raayraay96@users.noreply.github.com">Eric Raymond</author>
+  <license>MIT</license>
+  <url type="website">https://github.com/raayraay96/summer25-Franka-ros-noetic</url>
+  <url type="bugtracker">https://github.com/raayraay96/summer25-Franka-ros-noetic/issues</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>rospy</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>cv_bridge</depend>
+  <depend>image_transport</depend>
+  <depend>tf</depend>
+
+  <!-- Optional at runtime: only required for simulation/hardware stacks -->
+  <exec_depend>usb_cam</exec_depend>
+  <exec_depend>rosbag</exec_depend>
+
+  <export>
+  </export>
+</package>

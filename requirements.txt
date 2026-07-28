@@ -1,0 +1,12 @@
+# Reproducible Python 3.8-3.10 environment for ROS Noetic / Ubuntu 20.04.
+--extra-index-url https://download.pytorch.org/whl/cpu
+numpy==1.24.4
+opencv-python==4.8.1.78
+opencv-contrib-python==4.8.1.78
+mediapipe==0.10.9
+torch==2.0.1+cpu
+PyYAML==6.0.1
+pytest==7.4.4
+Pillow==10.1.0
+black==23.12.1
+flake8==6.1.0
