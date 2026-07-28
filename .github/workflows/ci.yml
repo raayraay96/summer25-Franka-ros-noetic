@@ -1,7 +1,7 @@
 name: CI
 on:
   push:
-    branches: [main, portfolio-v2]
+    branches: [main, portfolio-v2, research-retargeting-v1.1]
   pull_request:
     branches: [main]
 permissions:
@@ -20,14 +20,37 @@ jobs:
           cache-dependency-path: requirements-ci.txt
       - name: Install quality dependencies
         run: python -m pip install -r requirements-ci.txt
-      - name: Pure logic tests
+      - name: Pure logic tests (mapping, safety, retargeting, CBF-QP, gating)
         run: python -m pytest -q tests/
       - name: Config and documentation validation
         run: python scripts/validate_repository.py
-      - name: Reproduce CPU benchmarks
+      - name: Reproduce CPU baselines
         run: |
           python benchmarks/benchmark_mapping.py
           python benchmarks/benchmark_latency.py
+      - name: v1.1 benchmark smoke + schema validation
+        run: |
+          python benchmarks/benchmark_retargeting_v11.py --smoke --output results/v1.1-ci
+          python - <<'PY'
+          import json, csv
+          from pathlib import Path
+          root = Path("results/v1.1-ci")
+          summary = json.loads((root / "benchmark-summary.json").read_text())
+          assert "aggregate_by_combo" in summary
+          assert summary["n_rows"] > 0
+          env = json.loads((root / "environment.json").read_text())
+          assert "python" in env and "command" in env
+          with (root / "benchmark-runs.csv").open() as f:
+              rows = list(csv.DictReader(f))
+          assert rows, "empty benchmark-runs.csv"
+          required = {
+              "retargeter", "safety", "trajectory",
+              "mapping_latency_mean_ms", "intervention_count",
+              "solver_failure_count", "dropped_command_count",
+          }
+          assert required.issubset(rows[0].keys()), rows[0].keys()
+          print(f"schema ok: {len(rows)} rows, combos={list(summary['aggregate_by_combo'])}")
+          PY
       - name: Black
         run: black --check src/vision_arm_control/src tests benchmarks scripts ros2_ws/src/franka_teleop_ros2
       - name: Flake8

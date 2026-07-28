@@ -22,12 +22,22 @@ for target in links:
     assert (ROOT / clean).exists(), f"README link does not resolve: {target}"
 for required in [
     "docs/architecture.svg",
+    "docs/architecture-v1.1.svg",
     "docs/topic-graph.svg",
     "docs/frame-tree.svg",
     "docs/repository-audit.md",
     "docs/safety.md",
     "docs/calibration.md",
     "docs/model-setup.md",
+    "docs/research/related-work.md",
+    "docs/research/baseline-state.md",
+    "docs/research/sew-inspired-retargeting.md",
+    "docs/research/cbf-safety-filter.md",
+    "docs/research/experiment-protocol.md",
+    "docs/research/results-v1.1.md",
+    "docs/research/limitations-v1.1.md",
+    "docs/case-study-v1.1.md",
+    "docs/references.bib",
     "CITATION.cff",
     "LICENSE",
 ]:

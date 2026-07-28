@@ -16,6 +16,7 @@ Developed initially during the **HUMANS MOVE Program at the University of Wyomin
 ## Contents
 
 - [60-Second Run (No Robot)](#60-second-run-no-robot)
+- [Research-Informed v1.1](#research-informed-v11)
 - [Demo](#demo)
 - [Architecture and Technical Design](#architecture)
 - [Results](#results)
@@ -53,6 +54,33 @@ roslaunch vision_arm_control perception_only.launch headless:=true
 
 Model weights stay outside Git. See [`docs/model-setup.md`](docs/model-setup.md) for `FRANKA_MODEL_DIR` and Purdue Scholar setup.
 
+## Research-Informed v1.1
+
+Portfolio story: **research prototype → reproducible system → paper-informed retargeting and safety evaluation.** Independent post-program engineering (2026); not UW/HUMANS MOVE supervised work.
+
+| Inspired by (not reproduced) | Actually implemented | Not implemented |
+|---|---|---|
+| SEW-Mimic orientation features ([arXiv:2602.01632](https://arxiv.org/abs/2602.01632)) | `sew_orientation` feature-level retargeter | Closed-form 7-DoF SEW joint solver |
+| CBF-QP safety filter ([arXiv:2604.11447](https://arxiv.org/abs/2604.11447)) | Experimental Cartesian `cbf_qp` | Formal certificates / dynamics CBF |
+| AnyTeleop modular interfaces ([arXiv:2307.04577](https://arxiv.org/abs/2307.04577)) | Selectable retargeter / safety / backend | Multi-robot AnyTeleop stack |
+| Vision shared-control teleop ([arXiv:2508.14994](https://arxiv.org/abs/2508.14994)) | Confidence gating + hold/recovery | Quadruped platform / their planner |
+
+**Default remains** `shoulder_relative` + `reject`/`clamp` + `dry_run`. New modes are opt-in via YAML.
+
+| Combo (Scholar host) | Map ms | Safety ms | Path m | Interv. % |
+|---|---:|---:|---:|---:|
+| shoulder_relative + reject | 0.033 | 0.003 | 0.310 | 1.4 |
+| sew_orientation + reject | 0.218 | 0.004 | 0.315 | 1.4 |
+| shoulder_relative + cbf_qp | 0.039 | 0.360 | 0.341 | 85.1 |
+| sew_orientation + cbf_qp | 0.234 | 0.369 | 0.342 | 84.9 |
+
+```bash
+python3 benchmarks/benchmark_retargeting_v11.py --config benchmarks/config/v11.yaml --output results/v1.1
+```
+
+Evidence: [`docs/research/`](docs/research/) · Protocol · Results · Case study: [`docs/case-study-v1.1.md`](docs/case-study-v1.1.md) · Media: [`docs/media/v1.1/`](docs/media/v1.1/)  
+**Simulation-only for v1.1 method demos.** No physical Franka claim. No metric-depth claim. No safety certification.
+
 ## Demo
 
 | Asset | Label | Status |
@@ -62,8 +90,9 @@ Model weights stay outside Git. See [`docs/model-setup.md`](docs/model-setup.md)
 | [GIF](docs/media/perception-headless-relative-depth.gif) · [MP4](docs/media/perception-headless-relative-depth.mp4) | Headless landmark JSON + relative-depth visualization | Synthetic schema demonstration; not a camera or hardware benchmark |
 | [Screenshot 1](https://github.com/user-attachments/assets/b5c32aea-6236-45f5-b62f-182bf95e7df9) · [Screenshot 2](https://github.com/user-attachments/assets/ddf8d767-7f2e-402e-ac0e-d0cc13ebf851) | Research-period depth output | Perception-only, not hardware proof |
 | Planned | Gazebo + MoveIt collision-aware recording | Not yet validated; the dry-run RViz video above is the current proof |
+| [v1.1 GIFs/MP4s](docs/media/v1.1/) | Pure-Python retargeting / CBF / gating demos | **Verified** synthetic trajectories; not RViz/Gazebo re-records |
 
-Demo provenance, labels, and reproduction commands: [`docs/media/README.md`](docs/media/README.md). ROS 2 Scholar evidence: [`docs/ros2-simulation.md`](docs/ros2-simulation.md) and [`results/ros2/`](results/ros2/).
+Demo provenance, labels, and reproduction commands: [`docs/media/README.md`](docs/media/README.md) · [`docs/media/v1.1/README.md`](docs/media/v1.1/README.md). ROS 2 Scholar evidence: [`docs/ros2-simulation.md`](docs/ros2-simulation.md) and [`results/ros2/`](results/ros2/).
 
 ## Key Features
 
@@ -160,21 +189,22 @@ The preserved audit in [`docs/repository-audit.md`](docs/repository-audit.md) re
 
 | State | Work |
 |---|---|
-| **Implemented** | Modular ROS1 nodes, pure-logic tests, pinned environment, Noetic container, CI, safety gates, clean history, ROS 2 RViz demo |
-| **In progress** | Measured camera calibration, dedicated safety/perception recordings from ROS topics, MoveIt planning integration |
-| **Planned** | RGB-D metric mapping, Gazebo collision demo, physical Franka re-validation with tracking and latency measurements |
+| **Implemented** | Modular ROS1 nodes, pure-logic tests, pinned environment, Noetic container, CI, safety gates, clean history, ROS 2 RViz demo, v1.1 SEW-inspired retargeting + CBF-QP + benchmarks |
+| **In progress** | Measured camera calibration, RViz re-record with selectable v1.1 strategies, MoveIt planning integration |
+| **Planned** | RGB-D metric mapping, verified SEW IK adapter, Gazebo collision demo, physical Franka re-validation |
 
 ## Author Contribution
 
 | Work | Contribution |
 |---|---|
 | HUMANS MOVE research prototype, Summer 2024 | Eric Raymond: perception experiments, ROS integration, teleoperation prototype, and research artifacts completed during the program |
-| Independent post-program portfolio engineering, 2026 | Eric Raymond: modular architecture, mapping/safety refactor, tests, benchmarks, documentation, CI, containers, and Purdue Scholar simulation workflow |
+| Independent post-program portfolio engineering, 2026 | Eric Raymond: modular architecture, mapping/safety refactor, tests, benchmarks, documentation, CI, containers, Scholar simulation, and research-informed v1.1 retargeting/safety evaluation |
 | Third-party systems | MediaPipe by Google; MonoDepth2 by Niantic; ROS/MoveIt and Franka ecosystem packages by their maintainers |
+| Cited research (not collaborators) | SEW-Mimic; CBF humanoid imitation; AnyTeleop; vision shared-control teleop — see [`docs/research/related-work.md`](docs/research/related-work.md) |
 
 ## Citation
 
-This repository was developed from work completed in the **HUMANS MOVE Program, University of Wyoming**. Cite the project with [`CITATION.cff`](CITATION.cff), and cite [MonoDepth2](https://github.com/nianticlabs/monodepth2), [MediaPipe](https://github.com/google/mediapipe), [ROS](https://www.ros.org/), [MoveIt](https://moveit.ros.org/), and [Franka Robotics](https://franka.de/) when their components are used.
+Initial prototype work was completed in the **HUMANS MOVE Program, University of Wyoming**. Post-program portfolio engineering is independent. Cite the project with [`CITATION.cff`](CITATION.cff) / [`docs/references.bib`](docs/references.bib). Also cite [MonoDepth2](https://github.com/nianticlabs/monodepth2), [MediaPipe](https://github.com/google/mediapipe), [ROS](https://www.ros.org/), [MoveIt](https://moveit.ros.org/), and [Franka Robotics](https://franka.de/) when their components are used.
 
 ## License
 
