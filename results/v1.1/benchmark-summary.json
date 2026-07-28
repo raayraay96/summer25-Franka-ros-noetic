@@ -1,0 +1,111 @@
+{
+  "version": "v1.1",
+  "environment": {
+    "hostname": "scholar-fe04.rcac.purdue.edu",
+    "os": "Linux-5.14.0-570.26.1.el9_6.x86_64-x86_64-with-glibc2.34",
+    "python": "3.9.21",
+    "machine": "x86_64",
+    "processor": "x86_64",
+    "date_utc": "2026-07-28T21:18:07.016981+00:00",
+    "seed": 42,
+    "smoke": false,
+    "command": "python3 benchmarks/benchmark_retargeting_v11.py --config /scratch/scholar/edraymon/franka-teleoperation/benchmarks/config/v11.yaml --output results/v1.1",
+    "notes": "CPU pure-Python retargeting + safety filter benchmarks. Not physical Franka. Not full SEW-Mimic joint solve. CBF-QP is experimental kinematic filter only."
+  },
+  "n_rows": 60,
+  "combinations": [
+    {
+      "retargeter": "shoulder_relative",
+      "safety": "reject"
+    },
+    {
+      "retargeter": "shoulder_relative",
+      "safety": "clamp"
+    },
+    {
+      "retargeter": "shoulder_relative",
+      "safety": "cbf_qp"
+    },
+    {
+      "retargeter": "sew_orientation",
+      "safety": "reject"
+    },
+    {
+      "retargeter": "sew_orientation",
+      "safety": "clamp"
+    },
+    {
+      "retargeter": "sew_orientation",
+      "safety": "cbf_qp"
+    }
+  ],
+  "trajectories": [
+    "horizontal_sweep",
+    "vertical_sweep",
+    "circle",
+    "figure_eight",
+    "step_input",
+    "near_full_extension",
+    "noisy_landmarks",
+    "one_second_dropout",
+    "workspace_boundary_crossing",
+    "obstacle_intersection"
+  ],
+  "aggregate_by_combo": {
+    "shoulder_relative+reject": {
+      "mapping_latency_mean_ms": 0.03297614127707978,
+      "safety_latency_mean_ms": 0.0031232468497294644,
+      "mean_ee_path_length_m": 0.3095241612497902,
+      "total_interventions": 11,
+      "total_solver_failures": 0,
+      "total_dropped_commands": 26,
+      "mean_intervention_pct": 1.375
+    },
+    "shoulder_relative+clamp": {
+      "mapping_latency_mean_ms": 0.03230628790333867,
+      "safety_latency_mean_ms": 0.0033024470142733594,
+      "mean_ee_path_length_m": 0.3126963821702665,
+      "total_interventions": 11,
+      "total_solver_failures": 0,
+      "total_dropped_commands": 15,
+      "mean_intervention_pct": 1.375
+    },
+    "shoulder_relative+cbf_qp": {
+      "mapping_latency_mean_ms": 0.03857325646094978,
+      "safety_latency_mean_ms": 0.35961964794506246,
+      "mean_ee_path_length_m": 0.34068979816943645,
+      "total_interventions": 681,
+      "total_solver_failures": 0,
+      "total_dropped_commands": 15,
+      "mean_intervention_pct": 85.125
+    },
+    "sew_orientation+reject": {
+      "mapping_latency_mean_ms": 0.21758408246872327,
+      "safety_latency_mean_ms": 0.003988019889220595,
+      "mean_ee_path_length_m": 0.315469193984817,
+      "total_interventions": 11,
+      "total_solver_failures": 0,
+      "total_dropped_commands": 26,
+      "mean_intervention_pct": 1.375
+    },
+    "sew_orientation+clamp": {
+      "mapping_latency_mean_ms": 0.2150074508972466,
+      "safety_latency_mean_ms": 0.004154663586702485,
+      "mean_ee_path_length_m": 0.3147776997328611,
+      "total_interventions": 11,
+      "total_solver_failures": 0,
+      "total_dropped_commands": 15,
+      "mean_intervention_pct": 1.375
+    },
+    "sew_orientation+cbf_qp": {
+      "mapping_latency_mean_ms": 0.2340945857577026,
+      "safety_latency_mean_ms": 0.36914224181180966,
+      "mean_ee_path_length_m": 0.3422872448598257,
+      "total_interventions": 679,
+      "total_solver_failures": 0,
+      "total_dropped_commands": 15,
+      "mean_intervention_pct": 84.875
+    }
+  },
+  "repeatability": {}
+}

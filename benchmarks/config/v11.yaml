@@ -1,0 +1,47 @@
+# Research retargeting v1.1 benchmark configuration
+seed: 42
+dt: 0.05
+duration_sec: 4.0
+smoke: false
+initial_position: [0.45, 0.0, 0.45]
+workspace:
+  x_min: 0.25
+  x_max: 0.75
+  y_min: -0.40
+  y_max: 0.40
+  z_min: 0.05
+  z_max: 0.80
+cbf_qp:
+  alpha: 4.0
+  workspace_margin_m: 0.03
+  max_cartesian_velocity_mps: 0.20
+  stop_on_solver_failure: true
+  obstacles:
+    - id: demo_sphere
+      center: [0.48, 0.00, 0.35]
+      radius_m: 0.10
+      margin_m: 0.05
+combinations:
+  - retargeter: shoulder_relative
+    safety: reject
+  - retargeter: shoulder_relative
+    safety: clamp
+  - retargeter: shoulder_relative
+    safety: cbf_qp
+  - retargeter: sew_orientation
+    safety: reject
+  - retargeter: sew_orientation
+    safety: clamp
+  - retargeter: sew_orientation
+    safety: cbf_qp
+trajectories:
+  - horizontal_sweep
+  - vertical_sweep
+  - circle
+  - figure_eight
+  - step_input
+  - near_full_extension
+  - noisy_landmarks
+  - one_second_dropout
+  - workspace_boundary_crossing
+  - obstacle_intersection
