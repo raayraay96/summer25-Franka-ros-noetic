@@ -17,6 +17,8 @@ Software safeguards in this repository are assistive only. They do not replace m
 ## Implemented software controls
 
 - Cartesian workspace reject/clamp policy
+- Experimental Cartesian CBF-QP filter (`safety_filter.mode: cbf_qp`) — kinematic only; not certified
+- Confidence-aware hold / stop / recovery gating for low-quality landmarks
 - Cartesian velocity limiting and command-rate limiting
 - Approximate Panda joint-limit checks in simulation utilities
 - Pose-loss timeout and stale-command rejection
@@ -40,8 +42,11 @@ Before any hardware run:
 
 - ISO or regulatory safety certification
 - Guaranteed collision avoidance without a successful planning scene and controller validation
+- Formal CBF forward-invariance certificates beyond the exact discrete model assumptions
 - Physical Franka validation in CI
 - Replacement for manufacturer or laboratory safety systems
+
+See also: [CBF filter notes](research/cbf-safety-filter.md).
 
 Runtime sources of truth: `src/vision_arm_control/config/safety.yaml` and `controller.yaml`.
 See also: [calibration](calibration.md) · [model setup](model-setup.md) · [repository audit](repository-audit.md).

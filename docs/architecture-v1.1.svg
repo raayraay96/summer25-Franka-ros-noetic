@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="420" viewBox="0 0 920 420">
+  <rect width="920" height="420" fill="#0b1220"/>
+  <text x="28" y="36" fill="#e2e8f0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" font-weight="700">v1.1 Teleoperation Pipeline</text>
+  <text x="28" y="58" fill="#94a3b8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12">Selectable strategies · dry_run default · simulation / research comparison</text>
+
+  <rect x="30" y="100" width="140" height="70" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+  <text x="100" y="130" text-anchor="middle" fill="#e2e8f0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600">Landmark</text>
+  <text x="100" y="150" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11">Source</text>
+
+  <path d="M170 135 H200" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="200" y="100" width="140" height="70" rx="10" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+  <text x="270" y="130" text-anchor="middle" fill="#e2e8f0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600">Confidence</text>
+  <text x="270" y="150" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11">Gate</text>
+
+  <path d="M340 135 H370" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="370" y="100" width="150" height="70" rx="10" fill="#1e293b" stroke="#34d399" stroke-width="2"/>
+  <text x="445" y="125" text-anchor="middle" fill="#e2e8f0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600">Retargeter</text>
+  <text x="445" y="145" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10">shoulder_relative</text>
+  <text x="445" y="160" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10">sew_orientation</text>
+
+  <path d="M520 135 H550" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="550" y="100" width="150" height="70" rx="10" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+  <text x="625" y="125" text-anchor="middle" fill="#e2e8f0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600">Safety Filter</text>
+  <text x="625" y="145" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10">reject · clamp</text>
+  <text x="625" y="160" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10">cbf_qp (exp.)</text>
+
+  <path d="M700 135 H730" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="730" y="100" width="150" height="70" rx="10" fill="#1e293b" stroke="#f472b6" stroke-width="2"/>
+  <text x="805" y="125" text-anchor="middle" fill="#e2e8f0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600">Backend</text>
+  <text x="805" y="145" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10">dry_run (default)</text>
+  <text x="805" y="160" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10">ros2_fake · MoveIt*</text>
+
+  <rect x="200" y="230" width="500" height="70" rx="10" fill="#111827" stroke="#475569" stroke-width="2"/>
+  <text x="450" y="260" text-anchor="middle" fill="#e2e8f0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600">Metrics Recorder</text>
+  <text x="450" y="280" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11">latency · interventions · path length · clearance · recovery time</text>
+
+  <path d="M445 170 V230" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M625 170 V200 H450 V230" stroke="#64748b" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+
+  <text x="28" y="350" fill="#94a3b8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11">* optional_moveit only if verified — not default. No physical Franka claim.</text>
+  <text x="28" y="372" fill="#64748b" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11">Inspired by modular teleop architecture ideas (AnyTeleop); not a code reproduction.</text>
+  <text x="28" y="394" fill="#64748b" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11">SEW features inspired by arXiv:2602.01632 · CBF-QP inspired by arXiv:2604.11447</text>
+
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#64748b"/>
+    </marker>
+  </defs>
+</svg>

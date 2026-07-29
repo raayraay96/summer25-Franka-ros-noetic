@@ -4,3 +4,6 @@ pytest==7.4.4
 Pillow==10.1.0
 black==23.12.1
 flake8==6.1.0
+# Dev/CI-only trusted QP cross-validation oracle (runtime stays numpy-only).
+scipy==1.10.1
+osqp==0.6.3

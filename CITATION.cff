@@ -8,7 +8,7 @@ authors:
 repository-code: "https://github.com/raayraay96/summer25-Franka-ros-noetic"
 url: "https://github.com/raayraay96/summer25-Franka-ros-noetic"
 license: MIT
-version: 1.0.0
+version: 1.1.0
 date-released: 2026-07-28
 keywords:
   - ROS
@@ -18,6 +18,8 @@ keywords:
   - MediaPipe
   - relative depth
   - robotics safety
+  - motion retargeting
+  - control barrier functions
 preferred-citation:
   type: software
   title: "Vision-Guided Franka Panda Teleoperation"

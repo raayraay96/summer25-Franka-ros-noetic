@@ -2,13 +2,18 @@
 #
 # Implemented mapping class:
 #   End-effector position teleoperation (not full upper-body retargeting)
+#
+# v1.1 selectable retargeters (defaults preserve v1.0 behavior):
+#   shoulder_relative — baseline shoulder→wrist displacement teleop
+#   sew_orientation  — SEW-inspired arm orientation features (paper-inspired)
 
 mapping:
-  mode: "shoulder_relative"  # shoulder_relative | image_plane_scaled
+  mode: "shoulder_relative"  # shoulder_relative | sew_orientation | image_plane_scaled
   human_landmarks:
     wrist: "right_wrist"
+    elbow: "right_elbow"
     shoulder: "right_shoulder"
-  # Workspace origin and scale for shoulder-relative mode (meters / normalized)
+  # Workspace origin and scale for shoulder-relative / SEW modes (meters / normalized)
   workspace_origin: [0.45, 0.0, 0.45]
   workspace_scale: [0.55, 0.55, 0.35]
   # Relative monocular depth proxy (NOT metric unless calibrated)
@@ -16,6 +21,23 @@ mapping:
   relative_depth_scale: 1.0
   relative_depth_offset: 0.8
   min_landmark_confidence: 0.5
+  # SEW-inspired scale knobs (configuration only; not measured anthropometry)
+  human_upper_arm_ref_m: 0.28
+  human_lower_arm_ref_m: 0.25
+  robot_reach_scale: 0.55
+  min_segment_norm: 1.0e-4
+  collinear_sin_eps: 1.0e-3
+
+# Confidence-aware gating (not probabilistic UQ)
+confidence_gate:
+  min_keypoint_confidence: 0.5
+  hold_interval_sec: 0.25
+  stale_timeout_sec: 0.50
+  recovery_blend_sec: 0.30
+  max_timestamp_rewind_sec: 0.05
+  require_shoulder: true
+  require_elbow: false   # true when using sew_orientation
+  require_wrist: true
 
 frames:
   camera_frame: "camera_optical_frame"

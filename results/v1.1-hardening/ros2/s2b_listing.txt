@@ -1,0 +1,17 @@
+total 231K
+-rw------- 1 edraymon student 290K Jul 29 17:04 rviz_demo.jsonl
+-rw------- 1 edraymon student  466 Jul 29 17:04 rviz_demo_metrics.json
+-rw------- 1 edraymon student  836 Jul 29 17:05 s2b_joint_evidence.json
+-rw------- 1 edraymon student   12 Jul 29 17:04 s2b_services.txt
+-rw------- 1 edraymon student 220K Jul 29 17:03 scenario_a_shoulder_cbf.jsonl
+drwx------ 2 edraymon student    4 Jul 29 17:03 scenario_a_shoulder_cbf_bag
+-rw------- 1 edraymon student  437 Jul 29 17:03 scenario_a_shoulder_cbf_metrics.json
+-rw------- 1 edraymon student 226K Jul 29 17:03 scenario_b_sew_cbf.jsonl
+drwx------ 2 edraymon student    4 Jul 29 17:03 scenario_b_sew_cbf_bag
+-rw------- 1 edraymon student  437 Jul 29 17:03 scenario_b_sew_cbf_metrics.json
+-rw------- 1 edraymon student 229K Jul 29 17:04 scenario_c_obstacle_interv.jsonl
+drwx------ 2 edraymon student    4 Jul 29 17:04 scenario_c_obstacle_interv_bag
+-rw------- 1 edraymon student  466 Jul 29 17:04 scenario_c_obstacle_interv_metrics.json
+-rw------- 1 edraymon student    0 Jul 29 17:04 scenario_s2b_moveit_ik.jsonl
+drwx------ 2 edraymon student    4 Jul 29 17:05 scenario_s2b_moveit_ik_bag
+-rw------- 1 edraymon student   21 Jul 29 17:05 scenario_s2b_moveit_ik_metrics.json

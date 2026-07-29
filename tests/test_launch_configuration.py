@@ -58,6 +58,9 @@ def test_intrinsics_labeled_example():
 
 def test_no_personal_absolute_paths_in_configs_and_launch():
     needle = "/" + "home" + "/edr"
-    for path in list(LAUNCH.glob("*")) + list(CONFIG.glob("*")):
+    # rglob so config subdirectories (e.g. config/fixtures) are covered too.
+    for path in list(LAUNCH.rglob("*")) + list(CONFIG.rglob("*")):
+        if not path.is_file():
+            continue
         text = path.read_text()
         assert needle not in text, path

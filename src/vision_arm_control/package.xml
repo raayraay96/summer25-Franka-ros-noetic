@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>vision_arm_control</name>
-  <version>0.2.0</version>
+  <version>0.3.0</version>
   <description>
     Vision-guided end-effector position teleoperation for a Franka Emika Panda
     using ROS Noetic, MediaPipe pose estimation, and optional monocular depth.

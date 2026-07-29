@@ -1,0 +1,90 @@
+{
+  "scenarios": {
+    "scenario_a_shoulder_cbf": {
+      "acceptance_rate": 1.0,
+      "command_rate_hz": 20.046884165805437,
+      "dropped_rate": 0.0,
+      "elapsed_s": 21.34995126724243,
+      "final_dropped_command_count": 0,
+      "intervention_pct": 0.0,
+      "mean_intervention_magnitude": 0.0,
+      "mean_latency_ms": 0.38826258670294955,
+      "mode_transitions": 1,
+      "n_records": 428,
+      "solver_failures": 0,
+      "solver_status_counts": {
+        "optimal": 428
+      },
+      "state_counts": {
+        "commanded": 428
+      }
+    },
+    "scenario_b_sew_cbf": {
+      "acceptance_rate": 1.0,
+      "command_rate_hz": 20.046848123282498,
+      "dropped_rate": 0.0,
+      "elapsed_s": 21.349989652633667,
+      "final_dropped_command_count": 0,
+      "intervention_pct": 0.0,
+      "mean_intervention_magnitude": 0.0,
+      "mean_latency_ms": 0.3001640396297117,
+      "mode_transitions": 1,
+      "n_records": 428,
+      "solver_failures": 0,
+      "solver_status_counts": {
+        "optimal": 428
+      },
+      "state_counts": {
+        "commanded": 428
+      }
+    },
+    "scenario_c_obstacle_interv": {
+      "acceptance_rate": 1.0,
+      "command_rate_hz": 20.046447226320186,
+      "dropped_rate": 0.0,
+      "elapsed_s": 21.54995322227478,
+      "final_dropped_command_count": 0,
+      "intervention_pct": 51.157407407407405,
+      "mean_intervention_magnitude": 0.20317241468549257,
+      "mean_latency_ms": 11.16622070656848,
+      "mode_transitions": 1,
+      "n_records": 432,
+      "solver_failures": 0,
+      "solver_status_counts": {
+        "optimal": 432
+      },
+      "state_counts": {
+        "commanded": 432
+      }
+    },
+    "rviz_demo": {
+      "acceptance_rate": 1.0,
+      "command_rate_hz": 20.037658161714518,
+      "dropped_rate": 0.0,
+      "elapsed_s": 26.55000877380371,
+      "final_dropped_command_count": 0,
+      "intervention_pct": 51.31578947368421,
+      "mean_intervention_magnitude": 0.20283700919439462,
+      "mean_latency_ms": 11.627890048828677,
+      "mode_transitions": 1,
+      "n_records": 532,
+      "solver_failures": 0,
+      "solver_status_counts": {
+        "optimal": 532
+      },
+      "state_counts": {
+        "commanded": 532
+      }
+    }
+  },
+  "s2b": {
+    "status": "verified_moveit_jointstate_evidence",
+    "n_samples": 16,
+    "n_ok": 16,
+    "n_fail": 0,
+    "service": "/compute_ik",
+    "ik_backend": "moveit",
+    "physical_hardware": false,
+    "dry_run": true
+  }
+}

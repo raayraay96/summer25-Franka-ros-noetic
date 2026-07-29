@@ -12,7 +12,23 @@ safety:
     y_max: 0.40
     z_min: 0.05
     z_max: 0.80
-  workspace_mode: "reject"  # reject | clamp
+  # Baseline hard filters still available: reject | clamp
+  # Experimental kinematic CBF-QP filter: cbf_qp
+  workspace_mode: "reject"  # reject | clamp  (legacy alias for hard limits)
+
+  # v1.1 selectable safety filter (default preserves reject/clamp behavior)
+  safety_filter:
+    mode: reject  # reject | clamp | cbf_qp
+    dt: 0.05
+    alpha: 4.0
+    workspace_margin_m: 0.03
+    max_cartesian_velocity_mps: 0.20
+    stop_on_solver_failure: true
+    obstacles:
+      - id: demo_sphere
+        center: [0.48, 0.00, 0.35]
+        radius_m: 0.10
+        margin_m: 0.05
 
   max_linear_velocity: 0.20   # m/s
   max_joint_velocity: 1.0    # rad/s (software check only)

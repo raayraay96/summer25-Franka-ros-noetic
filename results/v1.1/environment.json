@@ -1,0 +1,12 @@
+{
+  "hostname": "scholar-fe04.rcac.purdue.edu",
+  "os": "Linux-5.14.0-570.26.1.el9_6.x86_64-x86_64-with-glibc2.34",
+  "python": "3.9.21",
+  "machine": "x86_64",
+  "processor": "x86_64",
+  "date_utc": "2026-07-28T21:18:07.016981+00:00",
+  "seed": 42,
+  "smoke": false,
+  "command": "python3 benchmarks/benchmark_retargeting_v11.py --config /scratch/scholar/edraymon/franka-teleoperation/benchmarks/config/v11.yaml --output results/v1.1",
+  "notes": "CPU pure-Python retargeting + safety filter benchmarks. Not physical Franka. Not full SEW-Mimic joint solve. CBF-QP is experimental kinematic filter only."
+}

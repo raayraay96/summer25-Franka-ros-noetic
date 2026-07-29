@@ -1,0 +1,19 @@
+{
+  "acceptance_rate": 1.0,
+  "command_rate_hz": 20.046848123282498,
+  "dropped_rate": 0.0,
+  "elapsed_s": 21.349989652633667,
+  "final_dropped_command_count": 0,
+  "intervention_pct": 0.0,
+  "mean_intervention_magnitude": 0.0,
+  "mean_latency_ms": 0.3001640396297117,
+  "mode_transitions": 1,
+  "n_records": 428,
+  "solver_failures": 0,
+  "solver_status_counts": {
+    "optimal": 428
+  },
+  "state_counts": {
+    "commanded": 428
+  }
+}

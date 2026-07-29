@@ -1,0 +1,6 @@
+[ok] /repo/src/vision_arm_control/config/fixtures/cbf_test.yaml
+[ok] /repo/src/vision_arm_control/config/fixtures/default_safe.yaml
+[ok] /repo/src/vision_arm_control/config/fixtures/ros2_fake_hardware.yaml
+[ok] /repo/src/vision_arm_control/config/fixtures/sew_feature_demo.yaml
+[ok] /repo/src/vision_arm_control/config/fixtures/shoulder_relative_demo.yaml
+validated 5 config(s)
