@@ -1,0 +1,772 @@
+{
+  "gate": "S2-B",
+  "service": "/compute_ik",
+  "ik_backend": "moveit",
+  "verified_topic": "/teleop/ik_joint_states",
+  "frame_id_expected": "verified_moveit",
+  "samples": [
+    {
+      "target_xyz": [
+        0.4,
+        0.0,
+        0.45
+      ],
+      "frame_id": "verified_moveit",
+      "name": [
+        "panda_joint1",
+        "panda_joint2",
+        "panda_joint3",
+        "panda_joint4",
+        "panda_joint5",
+        "panda_joint6",
+        "panda_joint7"
+      ],
+      "position": [
+        0.20793666460228877,
+        -0.47717870923768946,
+        -0.1893378199217939,
+        -2.494659605359645,
+        -0.09624598704797795,
+        2.0229734474451666,
+        0.08148377963950082
+      ],
+      "within_limits": true
+    },
+    {
+      "target_xyz": [
+        0.45,
+        0.1,
+        0.4
+      ],
+      "frame_id": "verified_moveit",
+      "name": [
+        "panda_joint1",
+        "panda_joint2",
+        "panda_joint3",
+        "panda_joint4",
+        "panda_joint5",
+        "panda_joint6",
+        "panda_joint7"
+      ],
+      "position": [
+        0.3044452338461546,
+        -0.22249398490016228,
+        -0.08333748197361687,
+        -2.4025921767921674,
+        -0.022410426666551173,
+        2.1807272298044666,
+        0.23599109664262444
+      ],
+      "within_limits": true
+    },
+    {
+      "target_xyz": [
+        0.45,
+        -0.1,
+        0.4
+      ],
+      "frame_id": "verified_moveit",
+      "name": [
+        "panda_joint1",
+        "panda_joint2",
+        "panda_joint3",
+        "panda_joint4",
+        "panda_joint5",
+        "panda_joint6",
+        "panda_joint7"
+      ],
+      "position": [
+        0.12950051578868238,
+        -0.23508709799033295,
+        -0.33782519383414183,
+        -2.4017478886534156,
+        -0.09410544146467338,
+        2.177424320377724,
+        -0.14594101132781975
+      ],
+      "within_limits": true
+    },
+    {
+      "target_xyz": [
+        0.5,
+        0.0,
+        0.35
+      ],
+      "frame_id": "verified_moveit",
+      "name": [
+        "panda_joint1",
+        "panda_joint2",
+        "panda_joint3",
+        "panda_joint4",
+        "panda_joint5",
+        "panda_joint6",
+        "panda_joint7"
+      ],
+      "position": [
+        0.2345192944153309,
+        -0.03741743139116925,
+        -0.23389383705753353,
+        -2.33774482210045,
+        -0.011640514067083536,
+        2.3013116372785483,
+        0.008550542830519033
+      ],
+      "within_limits": true
+    },
+    {
+      "target_xyz": [
+        0.35,
+        0.15,
+        0.5
+      ],
+      "frame_id": "verified_moveit",
+      "name": [
+        "panda_joint1",
+        "panda_joint2",
+        "panda_joint3",
+        "panda_joint4",
+        "panda_joint5",
+        "panda_joint6",
+        "panda_joint7"
+      ],
+      "position": [
+        0.4788786334523227,
+        -0.561911084422554,
+        -0.062124320500000114,
+        -2.438584211087885,
+        -0.03470356353481955,
+        1.8773700456253366,
+        0.43676459939877965
+      ],
+      "within_limits": true
+    },
+    {
+      "target_xyz": [
+        0.42,
+        -0.12,
+        0.48
+      ],
+      "frame_id": "verified_moveit",
+      "name": [
+        "panda_joint1",
+        "panda_joint2",
+        "panda_joint3",
+        "panda_joint4",
+        "panda_joint5",
+        "panda_joint6",
+        "panda_joint7"
+      ],
+      "position": [
+        0.3153844031835043,
+        -0.43389491243830725,
+        -0.5258168631225757,
+        -2.327671854008105,
+        -0.22802342298033626,
+        1.9376506334082693,
+        -0.08622300917379978
+      ],
+      "within_limits": true
+    },
+    {
+      "target_xyz": [
+        0.48,
+        0.05,
+        0.42
+      ],
+      "frame_id": "verified_moveit",
+      "name": [
+        "panda_joint1",
+        "panda_joint2",
+        "panda_joint3",
+        "panda_joint4",
+        "panda_joint5",
+        "panda_joint6",
+        "panda_joint7"
+      ],
+      "position": [
+        0.48033033462379465,
+        -0.19291321389368382,
+        -0.36292528977982136,
+        -2.303720502779683,
+        -0.0799637954186406,
+        2.121664102146815,
+        0.16549597928773613
+      ],
+      "within_limits": true
+    },
+    {
+      "target_xyz": [
+        0.38,
+        0.0,
+        0.55
+      ],
+      "frame_id": "verified_moveit",
+      "name": [
+        "panda_joint1",
+        "panda_joint2",
+        "panda_joint3",
+        "panda_joint4",
+        "panda_joint5",
+        "panda_joint6",
+        "panda_joint7"
+      ],
+      "position": [
+        0.45230869205365365,
+        -0.6121839977781598,
+        -0.34784661447620513,
+        -2.311805277105803,
+        -0.1995696632286289,
+        1.7252708621210255,
+        0.19495535346852316
+      ],
+      "within_limits": true
+    },
+    {
+      "target_xyz": [
+        0.4,
+        0.0,
+        0.45
+      ],
+      "frame_id": "verified_moveit",
+      "name": [
+        "panda_joint1",
+        "panda_joint2",
+        "panda_joint3",
+        "panda_joint4",
+        "panda_joint5",
+        "panda_joint6",
+        "panda_joint7"
+      ],
+      "position": [
+        0.455907170695349,
+        -0.5128438843181063,
+        -0.4121431710342446,
+        -2.4904610309407977,
+        -0.2183687597252909,
+        2.004895251635079,
+        0.18500211743911835
+      ],
+      "within_limits": true
+    },
+    {
+      "target_xyz": [
+        0.45,
+        0.1,
+        0.4
+      ],
+      "frame_id": "verified_moveit",
+      "name": [
+        "panda_joint1",
+        "panda_joint2",
+        "panda_joint3",
+        "panda_joint4",
+        "panda_joint5",
+        "panda_joint6",
+        "panda_joint7"
+      ],
+      "position": [
+        0.58516317530543,
+        -0.2366083537564821,
+        -0.3555481366488762,
+        -2.4016434786476433,
+        -0.09945462147809513,
+        2.1770141123502436,
+        0.2955295883593328
+      ],
+      "within_limits": true
+    },
+    {
+      "target_xyz": [
+        0.45,
+        -0.1,
+        0.4
+      ],
+      "frame_id": "verified_moveit",
+      "name": [
+        "panda_joint1",
+        "panda_joint2",
+        "panda_joint3",
+        "panda_joint4",
+        "panda_joint5",
+        "panda_joint6",
+        "panda_joint7"
+      ],
+      "position": [
+        0.4192306019089526,
+        -0.2722375696327759,
+        -0.6164500749091724,
+        -2.3990453596165855,
+        -0.18895305561849635,
+        2.1667132235844866,
+        -0.07270747661989226
+      ],
+      "within_limits": true
+    },
+    {
+      "target_xyz": [
+        0.5,
+        0.0,
+        0.35
+      ],
+      "frame_id": "verified_moveit",
+      "name": [
+        "panda_joint1",
+        "panda_joint2",
+        "panda_joint3",
+        "panda_joint4",
+        "panda_joint5",
+        "panda_joint6",
+        "panda_joint7"
+      ],
+      "position": [
+        0.5501345483087331,
+        -0.042653861477828604,
+        -0.5485285896625515,
+        -2.337671848383618,
+        -0.02984898100664389,
+        2.301048228201238,
+        0.02192497867036685
+      ],
+      "within_limits": true
+    },
+    {
+      "target_xyz": [
+        0.35,
+        0.15,
+        0.5
+      ],
+      "frame_id": "verified_moveit",
+      "name": [
+        "panda_joint1",
+        "panda_joint2",
+        "panda_joint3",
+        "panda_joint4",
+        "panda_joint5",
+        "panda_joint6",
+        "panda_joint7"
+      ],
+      "position": [
+        0.7398898776201623,
+        -0.5857921864615913,
+        -0.2793460725069322,
+        -2.4356691657232736,
+        -0.15993281357444847,
+        1.8643702910913,
+        0.5519154116418737
+      ],
+      "within_limits": true
+    },
+    {
+      "target_xyz": [
+        0.42,
+        -0.12,
+        0.48
+      ],
+      "frame_id": "verified_moveit",
+      "name": [
+        "panda_joint1",
+        "panda_joint2",
+        "panda_joint3",
+        "panda_joint4",
+        "panda_joint5",
+        "panda_joint6",
+        "panda_joint7"
+      ],
+      "position": [
+        0.6010345818532887,
+        -0.5312152339695854,
+        -0.7600949837799112,
+        -2.317826201330889,
+        -0.37678975802872544,
+        1.8927723525261377,
+        0.039005745848507765
+      ],
+      "within_limits": true
+    },
+    {
+      "target_xyz": [
+        0.48,
+        0.05,
+        0.42
+      ],
+      "frame_id": "verified_moveit",
+      "name": [
+        "panda_joint1",
+        "panda_joint2",
+        "panda_joint3",
+        "panda_joint4",
+        "panda_joint5",
+        "panda_joint6",
+        "panda_joint7"
+      ],
+      "position": [
+        0.8211427545184038,
+        -0.23459802159898044,
+        -0.6873194607312871,
+        -2.3013274614055863,
+        -0.17293466163506124,
+        2.1119940620815405,
+        0.23715231716636834
+      ],
+      "within_limits": true
+    },
+    {
+      "target_xyz": [
+        0.38,
+        0.0,
+        0.55
+      ],
+      "frame_id": "verified_moveit",
+      "name": [
+        "panda_joint1",
+        "panda_joint2",
+        "panda_joint3",
+        "panda_joint4",
+        "panda_joint5",
+        "panda_joint6",
+        "panda_joint7"
+      ],
+      "position": [
+        0.7816473371671261,
+        -0.7112274749444033,
+        -0.5781558472685139,
+        -2.2996232809115824,
+        -0.36655757745309736,
+        1.6676868066960149,
+        0.3596631081679079
+      ],
+      "within_limits": true
+    }
+  ],
+  "attempts": [
+    {
+      "target_xyz": [
+        0.4,
+        0.0,
+        0.45
+      ],
+      "ok": true,
+      "error_code": 1,
+      "joints": [
+        0.20793666460228877,
+        -0.47717870923768946,
+        -0.1893378199217939,
+        -2.494659605359645,
+        -0.09624598704797795,
+        2.0229734474451666,
+        0.08148377963950082
+      ],
+      "within_limits": true,
+      "frame_id": "verified_moveit"
+    },
+    {
+      "target_xyz": [
+        0.45,
+        0.1,
+        0.4
+      ],
+      "ok": true,
+      "error_code": 1,
+      "joints": [
+        0.3044452338461546,
+        -0.22249398490016228,
+        -0.08333748197361687,
+        -2.4025921767921674,
+        -0.022410426666551173,
+        2.1807272298044666,
+        0.23599109664262444
+      ],
+      "within_limits": true,
+      "frame_id": "verified_moveit"
+    },
+    {
+      "target_xyz": [
+        0.45,
+        -0.1,
+        0.4
+      ],
+      "ok": true,
+      "error_code": 1,
+      "joints": [
+        0.12950051578868238,
+        -0.23508709799033295,
+        -0.33782519383414183,
+        -2.4017478886534156,
+        -0.09410544146467338,
+        2.177424320377724,
+        -0.14594101132781975
+      ],
+      "within_limits": true,
+      "frame_id": "verified_moveit"
+    },
+    {
+      "target_xyz": [
+        0.5,
+        0.0,
+        0.35
+      ],
+      "ok": true,
+      "error_code": 1,
+      "joints": [
+        0.2345192944153309,
+        -0.03741743139116925,
+        -0.23389383705753353,
+        -2.33774482210045,
+        -0.011640514067083536,
+        2.3013116372785483,
+        0.008550542830519033
+      ],
+      "within_limits": true,
+      "frame_id": "verified_moveit"
+    },
+    {
+      "target_xyz": [
+        0.35,
+        0.15,
+        0.5
+      ],
+      "ok": true,
+      "error_code": 1,
+      "joints": [
+        0.4788786334523227,
+        -0.561911084422554,
+        -0.062124320500000114,
+        -2.438584211087885,
+        -0.03470356353481955,
+        1.8773700456253366,
+        0.43676459939877965
+      ],
+      "within_limits": true,
+      "frame_id": "verified_moveit"
+    },
+    {
+      "target_xyz": [
+        0.42,
+        -0.12,
+        0.48
+      ],
+      "ok": true,
+      "error_code": 1,
+      "joints": [
+        0.3153844031835043,
+        -0.43389491243830725,
+        -0.5258168631225757,
+        -2.327671854008105,
+        -0.22802342298033626,
+        1.9376506334082693,
+        -0.08622300917379978
+      ],
+      "within_limits": true,
+      "frame_id": "verified_moveit"
+    },
+    {
+      "target_xyz": [
+        0.48,
+        0.05,
+        0.42
+      ],
+      "ok": true,
+      "error_code": 1,
+      "joints": [
+        0.48033033462379465,
+        -0.19291321389368382,
+        -0.36292528977982136,
+        -2.303720502779683,
+        -0.0799637954186406,
+        2.121664102146815,
+        0.16549597928773613
+      ],
+      "within_limits": true,
+      "frame_id": "verified_moveit"
+    },
+    {
+      "target_xyz": [
+        0.38,
+        0.0,
+        0.55
+      ],
+      "ok": true,
+      "error_code": 1,
+      "joints": [
+        0.45230869205365365,
+        -0.6121839977781598,
+        -0.34784661447620513,
+        -2.311805277105803,
+        -0.1995696632286289,
+        1.7252708621210255,
+        0.19495535346852316
+      ],
+      "within_limits": true,
+      "frame_id": "verified_moveit"
+    },
+    {
+      "target_xyz": [
+        0.4,
+        0.0,
+        0.45
+      ],
+      "ok": true,
+      "error_code": 1,
+      "joints": [
+        0.455907170695349,
+        -0.5128438843181063,
+        -0.4121431710342446,
+        -2.4904610309407977,
+        -0.2183687597252909,
+        2.004895251635079,
+        0.18500211743911835
+      ],
+      "within_limits": true,
+      "frame_id": "verified_moveit"
+    },
+    {
+      "target_xyz": [
+        0.45,
+        0.1,
+        0.4
+      ],
+      "ok": true,
+      "error_code": 1,
+      "joints": [
+        0.58516317530543,
+        -0.2366083537564821,
+        -0.3555481366488762,
+        -2.4016434786476433,
+        -0.09945462147809513,
+        2.1770141123502436,
+        0.2955295883593328
+      ],
+      "within_limits": true,
+      "frame_id": "verified_moveit"
+    },
+    {
+      "target_xyz": [
+        0.45,
+        -0.1,
+        0.4
+      ],
+      "ok": true,
+      "error_code": 1,
+      "joints": [
+        0.4192306019089526,
+        -0.2722375696327759,
+        -0.6164500749091724,
+        -2.3990453596165855,
+        -0.18895305561849635,
+        2.1667132235844866,
+        -0.07270747661989226
+      ],
+      "within_limits": true,
+      "frame_id": "verified_moveit"
+    },
+    {
+      "target_xyz": [
+        0.5,
+        0.0,
+        0.35
+      ],
+      "ok": true,
+      "error_code": 1,
+      "joints": [
+        0.5501345483087331,
+        -0.042653861477828604,
+        -0.5485285896625515,
+        -2.337671848383618,
+        -0.02984898100664389,
+        2.301048228201238,
+        0.02192497867036685
+      ],
+      "within_limits": true,
+      "frame_id": "verified_moveit"
+    },
+    {
+      "target_xyz": [
+        0.35,
+        0.15,
+        0.5
+      ],
+      "ok": true,
+      "error_code": 1,
+      "joints": [
+        0.7398898776201623,
+        -0.5857921864615913,
+        -0.2793460725069322,
+        -2.4356691657232736,
+        -0.15993281357444847,
+        1.8643702910913,
+        0.5519154116418737
+      ],
+      "within_limits": true,
+      "frame_id": "verified_moveit"
+    },
+    {
+      "target_xyz": [
+        0.42,
+        -0.12,
+        0.48
+      ],
+      "ok": true,
+      "error_code": 1,
+      "joints": [
+        0.6010345818532887,
+        -0.5312152339695854,
+        -0.7600949837799112,
+        -2.317826201330889,
+        -0.37678975802872544,
+        1.8927723525261377,
+        0.039005745848507765
+      ],
+      "within_limits": true,
+      "frame_id": "verified_moveit"
+    },
+    {
+      "target_xyz": [
+        0.48,
+        0.05,
+        0.42
+      ],
+      "ok": true,
+      "error_code": 1,
+      "joints": [
+        0.8211427545184038,
+        -0.23459802159898044,
+        -0.6873194607312871,
+        -2.3013274614055863,
+        -0.17293466163506124,
+        2.1119940620815405,
+        0.23715231716636834
+      ],
+      "within_limits": true,
+      "frame_id": "verified_moveit"
+    },
+    {
+      "target_xyz": [
+        0.38,
+        0.0,
+        0.55
+      ],
+      "ok": true,
+      "error_code": 1,
+      "joints": [
+        0.7816473371671261,
+        -0.7112274749444033,
+        -0.5781558472685139,
+        -2.2996232809115824,
+        -0.36655757745309736,
+        1.6676868066960149,
+        0.3596631081679079
+      ],
+      "within_limits": true,
+      "frame_id": "verified_moveit"
+    }
+  ],
+  "n_samples": 16,
+  "n_ok": 16,
+  "n_fail": 0,
+  "status": "verified_moveit_jointstate_evidence",
+  "physical_hardware": false,
+  "dry_run": true,
+  "bag_info": "\nFiles:             scenario_s2b_moveit_ik_bag_0.db3\nBag size:          24.5 KiB\nStorage id:        sqlite3\nDuration:          0.000000000s\nStart:             Apr 11 2262 19:47:16.854775807 (9223372036.854775807)\nEnd:               Apr 11 2262 19:47:16.854775807 (9223372036.854775807)\nMessages:          0\nTopic information: \n\n",
+  "jsonl_n": 16,
+  "jsonl_ok": 16
+}

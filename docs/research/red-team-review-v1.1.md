@@ -29,23 +29,34 @@ release name; S3 = minor.
    S2-C; now resolved for the pure-Python legs).
 6. **Are confidence intervals reproducible?** Yes — per-combo bootstrap 95% CIs
    in `results/v1.1-hardening/paired/paired-summary.json` (seeded).
-7. **Does the video execute the actual repository runtime?** There is no new
-   runtime video. Existing demos are pure-Python (honestly labeled) (S2).
-8. **Are reported joint values produced by verified IK?** No joint values are
-   reported; `joint_positions=None` everywhere (S-none; correctly gated).
+7. **Does the video execute the actual repository runtime?** Yes for S2-A:
+   `docs/media/v1.1-hardening/end-to-end-rviz.{mp4,gif}` records the real ROS 2
+   Humble pipeline on Scholar (job 459478, container `ros2_humble_franka.sif`,
+   dry_run, mock landmarks, no physical robot). Live diagnostics JSONL + metrics
+   under `results/v1.1-hardening/ros2/`. Pure-Python demos remain honestly
+   labeled as such.
+8. **Are reported joint values produced by verified IK?** Yes for S2-B dry_run
+   Cartesian targets: job **459481** recorded 16/16 MoveIt `/compute_ik`
+   JointStates with `frame_id=verified_moveit`, all `within_limits=true`,
+   `status=verified_moveit_jointstate_evidence` in
+   `results/v1.1-hardening/ros2/s2b_joint_evidence.json` (claim 11 **E**).
+   Scope is simulated dry_run only (no physical Franka). This is **not** SEW
+   joint retargeting: `sew_orientation` remains feature-level
+   (`joint_positions=None`).
 9. **Are frames and units explicit?** Yes — `frame-contracts.md` + schema
    provenance fields; the `z*0.5` heuristic is now the named
    `image_relative_z_scale` (S-none).
 10. **Does any text imply hardware validation?** Not in the code/docs added
-    here; the claims ledger enumerates prohibited wording (S-none, pending
-    README pass — see below).
-11. **Do all README numbers have committed evidence?** The README still shows
-    the pre-hardening single-replicate benchmark table; those numbers are now
-    stale (S2 — README not yet re-audited, deliberately deferred until the
-    paired benchmark exists).
+    here; the claims ledger enumerates prohibited wording. S2-A evidence is
+    explicitly dry_run / mock landmarks / no physical Franka.
+11. **Do all README numbers have committed evidence?** The README re-audited to
+    the paired numbers; S2-A media README cites job 459478 and SHA
+    `5403fe775f80c1fac604d695178314662179f9da`.
 12. **Can a reviewer reproduce the headline result from one command?** Yes for
     the QP correctness headline: `python scripts/qp_cross_validation.py`
-    (exit 0 = PASS). Not yet for a runtime demo (S2).
+    (exit 0 = PASS). S2-A ROS 2 path is reproducible via
+    `sbatch scholar/record_v11_hardening.slurm` on Scholar with the committed
+    container (dry_run only).
 
 ## Open issues
 
@@ -56,16 +67,34 @@ cross-validated. (The model-vs-reality gap is real but is an explicit scope
 boundary, tracked as S2, not a defect in the modeled filter.)
 
 ### Severity 2 (blocks "simulation-validated" release name)
-- **S2-A (open)** No end-to-end ROS 2 fake-hardware RViz recording from the real
-  runtime. Blocker: no ROS 2 / MoveIt / display in the audit VM. Smallest
-  repair: run the ROS 2 fake-hardware launch on a ROS 2 host (or in the Noetic
-  container extended with a ROS 2 layer) and record with the diagnostics topic.
-- **S2-B (open)** No verified simulated Panda IK / JointState evidence. Blocker:
-  same. Smallest repair: MoveIt `compute_ik` on a Panda fake-hardware bringup;
-  keep `sew_orientation` feature-only until then (already enforced in code).
+- **S2-A (resolved)** End-to-end ROS 2 fake-hardware RViz recording from the real
+  runtime with live diagnostics. Evidence: `docs/media/v1.1-hardening/end-to-end-rviz.{mp4,gif}`,
+  `results/v1.1-hardening/ros2/` (JSONL, metrics, bags), SLURM job **459478**,
+  container `ros2_humble_franka.sif`, host `scholar-b000.rcac.purdue.edu`,
+  git SHA `5403fe775f80c1fac604d695178314662179f9da`. Scenario A
+  (`shoulder_relative+cbf_qp`): command rate ~20.05 Hz, mean latency
+  ~0.39 ms, 0 solver failures, acceptance 1.0 (dry_run, mock landmarks,
+  `physical_hardware=false`). RViz demo used `ik=geometric_unverified` — **not**
+  verified MoveIt. No physical Franka.
+- **S2-B (resolved)** Verified simulated Panda MoveIt IK / JointState evidence
+  on focused re-run job **459481** (after headless `move_group` launch fix;
+  prior job 459478 had `/compute_ik` advertised but 0 samples). Evidence:
+  - `results/v1.1-hardening/ros2/s2b_joint_evidence.json`:
+    `status=verified_moveit_jointstate_evidence`, `n_samples=16`, `n_ok=16`,
+    `n_fail=0`, all samples `frame_id=verified_moveit`, `within_limits=true`,
+    `dry_run=true`, `physical_hardware=false`.
+  - `scenario_s2b_moveit_ik.jsonl` (16 lines); `scenario_s2b_moveit_ik_bag/`.
+  - Script: `scripts/s2b_moveit_ik_evidence.py`; launch
+    `panda_moveit_ik.launch.py`; service `/compute_ik`.
+  - Environment: Scholar + container `ros2_humble_franka.sif`.
+  - Scope honesty: Cartesian-target MoveIt `compute_ik` dry_run only — **not**
+    physical Franka, **not** SEW joint retargeting. `sew_orientation` remains
+    feature-level (`joint_positions=None`).
 - **S2-C (resolved, pure-Python legs)** Benchmark is now paired, 30 replicates,
   bootstrap CIs, per-trajectory, populated `repeatability`, 0 unsafe accepted,
-  fault injection. ROS callback/fake-hardware latency legs remain not measured.
+  fault injection. ROS callback/fake-hardware latency legs remain not measured
+  as a formal paired latency study (S2-A reports diagnostic mean latency on
+  the dry_run pipeline only).
 - **S2-D (resolved)** Versioned config-schema validation implemented
   (`config_schema.py`, `scripts/validate_config.py`, CI step, 18 tests).
   Fault-injection results are recorded (`fault-injection.json`).
@@ -79,10 +108,16 @@ boundary, tracked as S2, not a defect in the modeled filter.)
 
 ## Release readiness
 
-**Not release-ready as `v1.1-simulation-validated`.** The mathematical safety
-core is audited, corrected, and cross-validated; the benchmark is now paired and
-statistically characterized; config schema and fault injection are done
-(S2-C/D/E resolved). The two remaining blockers — **S2-A** (end-to-end ROS 2
-fake-hardware RViz demo) and **S2-B** (verified simulated Panda IK) — cannot be
-executed in this environment (no ROS 2 / MoveIt / display). The PR must stay
-**draft** until those run on a ROS host.
+**S2-A and S2-B both resolved** (simulation / dry_run scope). The mathematical
+safety core is audited, corrected, and cross-validated; the benchmark is paired
+and statistically characterized; config schema and fault injection are done
+(S2-C/D/E resolved); **S2-A** has a real ROS 2 dry_run RViz recording and
+diagnostics on Scholar (job **459478**, `ros2_humble_franka.sif`); **S2-B** has
+verified MoveIt `/compute_ik` JointState evidence (job **459481**,
+`status=verified_moveit_jointstate_evidence`, 16/16 limit-checked,
+`frame_id=verified_moveit`). Engineering evidence gates for the
+simulation-validated candidate are met; PR merge remains **optional / pending
+human authorization** (draft wording may be lifted when a human authorizes).
+Still **no** physical Franka claims, **no** paper parity, **no** metric depth,
+**no** full SEW-Mimic; `sew_orientation` stays feature-level. Dry_run / no
+physical Franka wording remains mandatory for all ROS evidence.

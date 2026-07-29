@@ -17,6 +17,8 @@
   <depend>tf_transformations</depend>
   <depend>launch</depend>
   <depend>launch_ros</depend>
+  <!-- Optional at runtime: only required when ik_backend:=moveit -->
+  <exec_depend>moveit_msgs</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

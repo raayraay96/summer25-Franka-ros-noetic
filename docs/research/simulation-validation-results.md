@@ -1,16 +1,28 @@
-# Simulation-Validation Results (Phase 7 executed)
+# Simulation-Validation Results (Phase 7 + S2-A ROS 2 dry_run)
 
 Independent post-program engineering by Eric Raymond (2026). All numbers below
-were generated in this repository on the audit host; no University of Wyoming,
-HUMANS MOVE, Purdue, or paper-author involvement. **Simulation / pure-Python
-only — no physical Franka, no ROS runtime.**
+were generated in this repository on documented hosts; no University of Wyoming,
+HUMANS MOVE, Purdue, or paper-author involvement. **Simulation / dry_run only —
+no physical Franka.**
 
-## Environment
+## Environments
+
+### Pure-Python (paired benchmark, QP oracle)
 
 Cursor Cloud VM, `Linux 6.12.94+ x86_64`, Python 3.10.20, numpy 1.24.4.
 Full provenance: `results/v1.1-hardening/paired/environment.json`.
-Latency legs `ros_callback_to_command_ms` and `fake_hardware_publication_ms` are
-**not measured** (no ROS in this VM).
+
+### ROS 2 Humble dry_run (S2-A + S2-B)
+
+- **S2-A** (end-to-end RViz): Scholar `scholar-b000.rcac.purdue.edu`, SLURM job
+  **459478**, container `ros2_humble_franka.sif`, ROS 2 Humble, Python 3.10.12,
+  git SHA `5403fe775f80c1fac604d695178314662179f9da`, date UTC
+  `2026-07-29T21:05:20+00:00`. Provenance:
+  `results/v1.1-hardening/ros2/environment.json`. `physical_hardware: false`.
+  Mock landmarks; teleop pipeline dry_run (no physical output).
+- **S2-B** (MoveIt IK): Scholar + same container family
+  `ros2_humble_franka.sif`, focused SLURM job **459481** (re-run after headless
+  `move_group` launch fix). Dry_run only; no physical Franka.
 
 ## 1. QP solver correctness (Phase 1)
 
@@ -90,8 +102,91 @@ Base trajectory `obstacle_intersection`, both cbf_qp combos. Evidence:
 +0.014 m. Timestamp reordering / future timestamps / staleness are gated by the
 `ConfidenceGate`; occlusions hold-then-stop per the default policy.
 
+## 4. ROS 2 runtime (S2-A) — end-to-end dry_run (resolved)
+
+Real ROS 2 Humble runtime on Scholar host `scholar-b000`, **dry_run only**,
+mock landmarks, **no physical Franka**. SLURM job **459478**, container
+`ros2_humble_franka.sif`, git SHA `5403fe775f80c1fac604d695178314662179f9da`,
+provenance `results/v1.1-hardening/ros2/environment.json`
+(`physical_hardware: false`).
+
+### Media
+
+| Artifact | Path |
+|---|---|
+| RViz recording (mp4) | `docs/media/v1.1-hardening/end-to-end-rviz.mp4` |
+| GIF | `docs/media/v1.1-hardening/end-to-end-rviz.gif` |
+| Thumbnail | `docs/media/v1.1-hardening/end-to-end-rviz-thumb.png` |
+| Media README | `docs/media/v1.1-hardening/README.md` |
+
+Launch path (recording): `teleop_pipeline_rviz.launch.py` — mock landmarks →
+TeleopPipeline (shoulder_relative + cbf_qp) → geometric_unverified IK → RSP →
+RViz. Labels: ROS 2 SIMULATION · MOCK LANDMARKS · PANDA FAKE HARDWARE · NO
+PHYSICAL ROBOT · RETARGETER · SAFETY FILTER · live diagnostics topic.
+
+### Scenario metrics (from committed `*_metrics.json`)
+
+Evidence root: `results/v1.1-hardening/ros2/`. Numbers below are from the
+JSON metrics files (rounded for readability where noted).
+
+| Scenario | Strategy / safety | Command rate (Hz) | Mean latency (ms) | Intervention % | Acceptance | n_records |
+|---|---|---:|---:|---:|---:|---:|
+| scenario_a_shoulder_cbf | shoulder_relative + cbf_qp | ~20.05 | **0.388** | 0.0 | 1.0 | 428 |
+| scenario_b_sew_cbf | sew_orientation + cbf_qp | ~20.05 | ~0.30 | 0.0 | 1.0 | 428 |
+| scenario_c_obstacle_interv | obstacle intervention path | ~20.05 | ~11.2 | ~51.2 | 1.0 | 432 |
+| rviz_demo (recorded) | shoulder_relative + cbf_qp | ~20.04 | ~11.6 | ~51.3 | 1.0 | 532 |
+
+Exact file values (for audit): scenario_a `command_rate_hz=20.0469`,
+`mean_latency_ms=0.3883`, `intervention_pct=0.0`, `n_records=428`;
+scenario_b `mean_latency_ms=0.3002`, `n_records=428`; scenario_c
+`mean_latency_ms=11.166`, `intervention_pct=51.157`, `n_records=432`;
+rviz_demo `mean_latency_ms=11.628`, `intervention_pct=51.316`, `n_records=532`.
+Solver failures: **0** across all four. Acceptance rate **1.0** on all four.
+
+Topic rates on live diagnostics ~20 Hz for target/command/safety (and
+joint_states when geometric IK / RSP path is active).
+
+Supporting artifacts: `rviz_demo.jsonl` + `rviz_demo_metrics.json`;
+scenario_a/b/c `*.jsonl`, `*_metrics.json`, `*_bag/` (rosbag2);
+`environment.json`, `s2a_rviz_ok.txt`, `s2a_scenarios_ok.txt`.
+Job log (host path): `.../franka-teleop-data/logs/v11-s2-459478.out`.
+
+**Honest scope for S2-A:** dry_run, mock landmarks, no physical robot. IK used
+for the RViz recording is **geometric_unverified** (or none on scenario A),
+**not** verified MoveIt `compute_ik`.
+
+## 5. S2-B — verified MoveIt IK (**resolved**; claim 11 **E**)
+
+Focused re-run job **459481** after headless `move_group` launch fix (prior job
+459478 had `/compute_ik` advertised but recorded 0 JointStates). Script:
+`scripts/s2b_moveit_ik_evidence.py`. Launch: `panda_moveit_ik.launch.py`.
+Service: `/compute_ik`. Environment: Scholar + `ros2_humble_franka.sif`.
+Dry_run only; **no physical hardware**.
+
+| Field | Value |
+|---|---|
+| Evidence file | `results/v1.1-hardening/ros2/s2b_joint_evidence.json` |
+| status | `verified_moveit_jointstate_evidence` |
+| n_samples | 16 |
+| n_ok / n_fail | 16 / 0 |
+| frame_id | `verified_moveit` (all samples) |
+| within_limits | true (all samples) |
+| dry_run / physical_hardware | true / false |
+| scenario_s2b_moveit_ik.jsonl | 16 lines (`jsonl_n=16`, `jsonl_ok=16`) |
+| bag | `scenario_s2b_moveit_ik_bag/` |
+
+**16/16** limit-checked `sensor_msgs/JointState` samples via MoveIt
+`compute_ik`, all with `frame_id=verified_moveit`.
+
+**Honest scope:** Cartesian-target MoveIt IK evidence only. This does **not**
+validate SEW joint retargeting, paper parity, or physical Franka execution.
+`sew_orientation` remains feature-level only (`joint_positions=None`).
+
 ## What this does NOT establish
 
 No physical Franka accuracy, no collision-free hardware execution, no metric
-depth, no verified IK/JointState, no ROS callback/fake-hardware latency, no
-paper-parity. See `claims-ledger.md` and `v1.1-final-limitations.md`.
+depth, no paper-parity, no full SEW-Mimic. S2-B is verified MoveIt Cartesian
+`compute_ik` dry_run JointState evidence only — not SEW joint retargeting.
+Paired pure-Python ROS callback / formal fake-hardware latency legs are still
+not a separate multi-replicate study (S2-A reports dry_run diagnostic mean
+latency only). See `claims-ledger.md` and `v1.1-final-limitations.md`.

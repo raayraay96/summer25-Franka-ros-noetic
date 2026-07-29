@@ -13,6 +13,7 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 
 
 def generate_launch_description():
@@ -23,7 +24,11 @@ def generate_launch_description():
     diagnostics_jsonl = LaunchConfiguration("diagnostics_jsonl")
     landmark_topic = LaunchConfiguration("landmark_topic")
 
-    default_obstacles = '[{"id": "demo_sphere", "center": [0.48, 0.0, 0.35], "radius_m": 0.10, "margin_m": 0.05}]'
+    # Keep as a JSON *string* (not a YAML sequence of maps) so CLI overrides work.
+    default_obstacles = (
+        '[{"id": "demo_sphere", "center": [0.48, 0.0, 0.35], '
+        '"radius_m": 0.10, "margin_m": 0.05}]'
+    )
 
     return LaunchDescription(
         [
@@ -38,7 +43,7 @@ def generate_launch_description():
                 executable="mock_landmark_publisher",
                 name="mock_landmark_publisher",
                 output="screen",
-                parameters=[{"topic": landmark_topic}],
+                parameters=[{"topic": ParameterValue(landmark_topic, value_type=str)}],
             ),
             Node(
                 package="franka_teleop_ros2",
@@ -47,12 +52,12 @@ def generate_launch_description():
                 output="screen",
                 parameters=[
                     {
-                        "retargeting_strategy": strategy,
-                        "safety_filter": safety,
-                        "ik_backend": ik_backend,
-                        "obstacles": obstacles,
-                        "landmark_topic": landmark_topic,
-                        "diagnostics_jsonl": diagnostics_jsonl,
+                        "retargeting_strategy": ParameterValue(strategy, value_type=str),
+                        "safety_filter": ParameterValue(safety, value_type=str),
+                        "ik_backend": ParameterValue(ik_backend, value_type=str),
+                        "obstacles": ParameterValue(obstacles, value_type=str),
+                        "landmark_topic": ParameterValue(landmark_topic, value_type=str),
+                        "diagnostics_jsonl": ParameterValue(diagnostics_jsonl, value_type=str),
                     }
                 ],
             ),

@@ -1,0 +1,10 @@
+{
+  "total_problems": 400,
+  "feasibility_mismatches": 0,
+  "objective_mismatches_two_sided": 0,
+  "solution_distance_mismatches": 0,
+  "kkt_verification_failures": 0,
+  "custom_worse_than_oracle": 0,
+  "passed": true
+}
+Wrote /repo/results/v1.1-hardening/qp-cross-validation.json
