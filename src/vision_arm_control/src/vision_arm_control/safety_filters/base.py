@@ -28,9 +28,24 @@ class SafetyFilterConfig:
     workspace_margin_m: float = 0.0
     dt: float = 0.05
     alpha: float = 4.0
-    max_cartesian_velocity_mps: float = 0.20
+    # Per-axis command-velocity limit (m/s). This is enforced by the CBF-QP as a
+    # per-axis box |u_axis| <= limit, which is NOT a Euclidean speed cap. The
+    # old name ``max_cartesian_velocity_mps`` is accepted as a back-compat alias
+    # but denoted the same per-axis box, never a Euclidean ball.
+    per_axis_velocity_limit_mps: float = 0.20
+    max_cartesian_velocity_mps: Optional[float] = None  # deprecated alias
     stop_on_solver_failure: bool = True
+    # When False (default), an exact-solver failure => stop (return None). When
+    # True, an unverified sequential-projection fallback may be used and is
+    # reported as ``feasible_projection_fallback`` (never ``optimal``).
+    allow_projection_fallback: bool = False
     obstacles: List[SphericalObstacle] = field(default_factory=list)
+
+    def __post_init__(self) -> None:
+        # Honor the deprecated alias if a caller still sets it.
+        if self.max_cartesian_velocity_mps is not None:
+            self.per_axis_velocity_limit_mps = float(self.max_cartesian_velocity_mps)
+        self.max_cartesian_velocity_mps = float(self.per_axis_velocity_limit_mps)
 
 
 @dataclass

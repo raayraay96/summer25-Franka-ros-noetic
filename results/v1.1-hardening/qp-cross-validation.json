@@ -1,0 +1,39 @@
+{
+  "custom_worse_than_oracle": 0,
+  "examples": {
+    "custom_worse": [],
+    "distance": [],
+    "feasibility": [],
+    "kkt": [],
+    "objective": []
+  },
+  "feasibility_mismatches": 0,
+  "kkt_verification_failures": 0,
+  "objective_mismatches_two_sided": 0,
+  "passed": true,
+  "per_family": {
+    "cbf": {
+      "feasible": 2475,
+      "max_objective_error": 4.718447854656915e-16,
+      "max_solution_distance": 4.677895672937242e-15,
+      "problems": 3000
+    },
+    "generic": {
+      "feasible": 2034,
+      "max_objective_error": 0.00025335740065202117,
+      "max_solution_distance": 8.757320893142107e-07,
+      "problems": 3000
+    }
+  },
+  "seed": 20260729,
+  "solution_distance_mismatches": 0,
+  "thresholds": {
+    "feasibility_agreement_required": 1.0,
+    "kkt_verified_required_for_optimal": true,
+    "objective_abs_tol": 1e-06,
+    "objective_rel_tol": 1e-05,
+    "solution_distance_tol": 0.001
+  },
+  "total_problems": 6000,
+  "version": "v1.1-hardening"
+}

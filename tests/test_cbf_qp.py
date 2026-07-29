@@ -51,7 +51,8 @@ def test_qp_feasible_free_space():
     res = f.filter([0.40, 0.0, 0.50], [0.42, 0.0, 0.50], dt=0.05)
     assert res.accepted
     assert res.position is not None
-    assert res.solver_status.startswith("solved")
+    # Truthful status: KKT-verified exact optimum only.
+    assert res.solver_status == "optimal"
 
 
 def test_workspace_barrier_slows_outbound():
@@ -67,16 +68,22 @@ def test_workspace_barrier_slows_outbound():
 
 
 def test_obstacle_barrier_intervention():
+    # Start in free space (safe), drive toward the obstacle. The accepted next
+    # state must INDEPENDENTLY satisfy the modeled safety set, not merely show
+    # that an intervention occurred.
     f = CBFQPFilter(_cfg())
-    # Start outside obstacle, drive through center
-    p = [0.35, 0.0, 0.35]
+    center = np.array([0.48, 0.0, 0.35])
+    p = [0.30, 0.0, 0.35]
     des = [0.60, 0.0, 0.35]
     res = f.filter(p, des, dt=0.05)
     assert res.accepted
     assert res.position is not None
-    # Should not enter the hard sphere (radius 0.10) in one step aggressively
-    dist = np.linalg.norm(res.position - np.array([0.48, 0.0, 0.35]))
-    assert dist >= 0.10 - 1e-3 or res.intervened
+    assert res.intervened
+    # Hard collision boundary (radius) must never be entered.
+    dist = float(np.linalg.norm(res.position - center))
+    assert dist >= 0.10 - 1e-6  # radius
+    # And the configured margin set must be respected from a safe start.
+    assert dist >= 0.10 + 0.05 - 1e-6  # radius + margin
 
 
 def test_solver_infeasible_rejects():
