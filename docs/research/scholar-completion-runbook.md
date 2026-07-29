@@ -1,13 +1,23 @@
 # Scholar Completion Runbook + Meta Prompt
 
-Independent post-program engineering by Eric Raymond (2026). This document lets a
-future session **finish PR #5 on a ROS 2 host (e.g. Purdue Scholar) with a small,
-mostly "pull-and-run" amount of work.** Everything doable without ROS/display has
-already been implemented and CI-verified in the audit VM; only the two
-environment-blocked gates remain:
+Independent post-program engineering by Eric Raymond (2026).
 
-- **S2-A** end-to-end ROS 2 fake-hardware RViz recording with live diagnostics.
-- **S2-B** verified simulated Panda IK (MoveIt `compute_ik`) + JointState evidence.
+## Status (completed)
+
+**PR #5 merged to `main`** (squash `2a89ffa`). Both environment-bound gates are
+done on Scholar dry_run (no physical Franka):
+
+| Gate | Status | Evidence |
+|------|--------|----------|
+| **S2-A** RViz + live diagnostics | **Done** (job 459478) | `docs/media/v1.1-hardening/`, `results/v1.1-hardening/ros2/` scenario/rviz JSONL+metrics+bags |
+| **S2-B** MoveIt `compute_ik` JointStates | **Done** (job 459481) | `s2b_joint_evidence.json` (`verified_moveit_jointstate_evidence`, 16/16), `scenario_s2b_moveit_ik.jsonl` |
+
+Reproduce with `sbatch scholar/record_v11_hardening.slurm` and/or
+`sbatch scholar/record_s2b_ik.slurm` inside `ros2_humble_franka.sif`.
+
+---
+
+Historical meta-prompt below (kept for reproducibility; gates no longer blocked):
 
 ## What is already done (no Scholar work needed)
 

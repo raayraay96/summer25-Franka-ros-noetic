@@ -289,16 +289,13 @@ class TeleopPipelineNode(Node):
         """
         if self._ik_client is None:
             self.get_logger().warn_once(
-                "moveit IK backend selected but GetPositionIK client unavailable; "
-                "publishing no joints"
+                "moveit IK backend selected but GetPositionIK client unavailable; " "publishing no joints"
             )
             self._ik_fail_count += 1
             return None, False
         if not self._ik_client.service_is_ready():
             if not self._ik_ready_logged:
-                self.get_logger().warn(
-                    "waiting for /compute_ik (start panda move_group / MoveIt demo)"
-                )
+                self.get_logger().warn("waiting for /compute_ik (start panda move_group / MoveIt demo)")
                 self._ik_ready_logged = True
             self._ik_fail_count += 1
             return None, False
@@ -345,10 +342,7 @@ class TeleopPipelineNode(Node):
             self._ik_fail_count += 1
             return None, False
         name_to_pos = {
-            n: float(v)
-            for n, v in zip(
-                resp.solution.joint_state.name, resp.solution.joint_state.position
-            )
+            n: float(v) for n, v in zip(resp.solution.joint_state.name, resp.solution.joint_state.position)
         }
         if not all(j in name_to_pos for j in PANDA_JOINTS):
             self._ik_fail_count += 1

@@ -104,8 +104,7 @@ class IkEvidenceNode(Node):
         if resp.error_code.val != 1:
             return rec
         name_to_pos = {
-            n: float(v)
-            for n, v in zip(resp.solution.joint_state.name, resp.solution.joint_state.position)
+            n: float(v) for n, v in zip(resp.solution.joint_state.name, resp.solution.joint_state.position)
         }
         if not all(j in name_to_pos for j in PANDA_JOINTS):
             rec["error"] = "missing_joint_names"
