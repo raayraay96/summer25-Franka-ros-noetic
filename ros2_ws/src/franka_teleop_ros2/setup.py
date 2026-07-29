@@ -29,6 +29,7 @@ setup(
             "target_visualizer = franka_teleop_ros2.target_visualizer:main",
             "diagnostics = franka_teleop_ros2.diagnostics:main",
             "demo_driver = franka_teleop_ros2.demo_driver:main",
+            "teleop_pipeline_node = franka_teleop_ros2.teleop_pipeline_node:main",
         ],
     },
 )
