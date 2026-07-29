@@ -43,8 +43,14 @@ also predates the Phase 1–2 solver hardening, so it is now **stale**.
 
 ## Status
 
-**NOT YET EXECUTED.** Blocker: the redesign is substantial and the ROS
-callback-to-command / fake-hardware latency legs require a ROS host not present
-in the audit VM. Until executed, no benchmark superiority is claimed and the
-stale `results/v1.1/` numbers must not be cited as current (tracked S2-C in the
-red-team review).
+**EXECUTED** for the pure-Python legs. `benchmarks/benchmark_paired_v11.py`
+implements this protocol; 30-replicate results are committed under
+`results/v1.1-hardening/paired/` and summarized in
+`simulation-validation-results.md` (1800 paired runs, 0 unsafe accepted states,
+0 solver failures, deterministic replay match, per-combo bootstrap CIs,
+per-trajectory breakdown, 10 fault-injection scenarios).
+
+Still **NOT** executed: the ROS callback-to-command and fake-hardware
+publication latency legs (require a ROS host absent from the audit VM). No
+benchmark **superiority** is claimed; the stale single-replicate `results/v1.1/`
+numbers are superseded by the paired results and must not be cited as current.

@@ -1,0 +1,228 @@
+{
+  "cpu_load": {
+    "scenario": "cpu_load",
+    "status": "not_simulated_pure_python"
+  },
+  "scenarios": [
+    {
+      "acceptance_rate": 1.0,
+      "combo": "shoulder_relative+cbf_qp",
+      "dropped_rate": 0.0,
+      "hold_steps": 0,
+      "min_hard_clearance_m": 0.014047069696928066,
+      "scenario": "latency",
+      "solver_failure_count": 0,
+      "stop_steps": 0,
+      "unsafe_accepted_count": 0
+    },
+    {
+      "acceptance_rate": 1.0,
+      "combo": "sew_orientation+cbf_qp",
+      "dropped_rate": 0.0,
+      "hold_steps": 0,
+      "min_hard_clearance_m": 0.014047069696928066,
+      "scenario": "latency",
+      "solver_failure_count": 0,
+      "stop_steps": 0,
+      "unsafe_accepted_count": 0
+    },
+    {
+      "acceptance_rate": 1.0,
+      "combo": "shoulder_relative+cbf_qp",
+      "dropped_rate": 0.0,
+      "hold_steps": 0,
+      "min_hard_clearance_m": 0.014047069696928066,
+      "scenario": "jitter",
+      "solver_failure_count": 0,
+      "stop_steps": 0,
+      "unsafe_accepted_count": 0
+    },
+    {
+      "acceptance_rate": 1.0,
+      "combo": "sew_orientation+cbf_qp",
+      "dropped_rate": 0.0,
+      "hold_steps": 0,
+      "min_hard_clearance_m": 0.014047069696928066,
+      "scenario": "jitter",
+      "solver_failure_count": 0,
+      "stop_steps": 0,
+      "unsafe_accepted_count": 0
+    },
+    {
+      "acceptance_rate": 1.0,
+      "combo": "shoulder_relative+cbf_qp",
+      "dropped_rate": 0.0,
+      "hold_steps": 27,
+      "min_hard_clearance_m": 0.014047069696928066,
+      "scenario": "packet_loss",
+      "solver_failure_count": 0,
+      "stop_steps": 0,
+      "unsafe_accepted_count": 0
+    },
+    {
+      "acceptance_rate": 1.0,
+      "combo": "sew_orientation+cbf_qp",
+      "dropped_rate": 0.0,
+      "hold_steps": 27,
+      "min_hard_clearance_m": 0.014047069696928066,
+      "scenario": "packet_loss",
+      "solver_failure_count": 0,
+      "stop_steps": 0,
+      "unsafe_accepted_count": 0
+    },
+    {
+      "acceptance_rate": 1.0,
+      "combo": "shoulder_relative+cbf_qp",
+      "dropped_rate": 0.0,
+      "hold_steps": 16,
+      "min_hard_clearance_m": 0.014047069696928066,
+      "scenario": "timestamp_reorder",
+      "solver_failure_count": 0,
+      "stop_steps": 0,
+      "unsafe_accepted_count": 0
+    },
+    {
+      "acceptance_rate": 1.0,
+      "combo": "sew_orientation+cbf_qp",
+      "dropped_rate": 0.0,
+      "hold_steps": 16,
+      "min_hard_clearance_m": 0.014047069696928066,
+      "scenario": "timestamp_reorder",
+      "solver_failure_count": 0,
+      "stop_steps": 0,
+      "unsafe_accepted_count": 0
+    },
+    {
+      "acceptance_rate": 1.0,
+      "combo": "shoulder_relative+cbf_qp",
+      "dropped_rate": 0.0,
+      "hold_steps": 0,
+      "min_hard_clearance_m": 0.014047069696928066,
+      "scenario": "future_timestamps",
+      "solver_failure_count": 0,
+      "stop_steps": 0,
+      "unsafe_accepted_count": 0
+    },
+    {
+      "acceptance_rate": 1.0,
+      "combo": "sew_orientation+cbf_qp",
+      "dropped_rate": 0.0,
+      "hold_steps": 0,
+      "min_hard_clearance_m": 0.014047069696928066,
+      "scenario": "future_timestamps",
+      "solver_failure_count": 0,
+      "stop_steps": 0,
+      "unsafe_accepted_count": 0
+    },
+    {
+      "acceptance_rate": 1.0,
+      "combo": "shoulder_relative+cbf_qp",
+      "dropped_rate": 0.0,
+      "hold_steps": 0,
+      "min_hard_clearance_m": 0.014047069696928066,
+      "scenario": "stale",
+      "solver_failure_count": 0,
+      "stop_steps": 0,
+      "unsafe_accepted_count": 0
+    },
+    {
+      "acceptance_rate": 1.0,
+      "combo": "sew_orientation+cbf_qp",
+      "dropped_rate": 0.0,
+      "hold_steps": 0,
+      "min_hard_clearance_m": 0.014047069696928066,
+      "scenario": "stale",
+      "solver_failure_count": 0,
+      "stop_steps": 0,
+      "unsafe_accepted_count": 0
+    },
+    {
+      "acceptance_rate": 0.975,
+      "combo": "shoulder_relative+cbf_qp",
+      "dropped_rate": 0.025,
+      "hold_steps": 38,
+      "min_hard_clearance_m": 0.014047069696928066,
+      "scenario": "confidence_oscillation",
+      "solver_failure_count": 0,
+      "stop_steps": 2,
+      "unsafe_accepted_count": 0
+    },
+    {
+      "acceptance_rate": 0.975,
+      "combo": "sew_orientation+cbf_qp",
+      "dropped_rate": 0.025,
+      "hold_steps": 38,
+      "min_hard_clearance_m": 0.014047069696928066,
+      "scenario": "confidence_oscillation",
+      "solver_failure_count": 0,
+      "stop_steps": 2,
+      "unsafe_accepted_count": 0
+    },
+    {
+      "acceptance_rate": 1.0,
+      "combo": "shoulder_relative+cbf_qp",
+      "dropped_rate": 0.0,
+      "hold_steps": 3,
+      "min_hard_clearance_m": 0.014047069696928066,
+      "scenario": "brief_occlusion",
+      "solver_failure_count": 0,
+      "stop_steps": 0,
+      "unsafe_accepted_count": 0
+    },
+    {
+      "acceptance_rate": 1.0,
+      "combo": "sew_orientation+cbf_qp",
+      "dropped_rate": 0.0,
+      "hold_steps": 3,
+      "min_hard_clearance_m": 0.014047069696928066,
+      "scenario": "brief_occlusion",
+      "solver_failure_count": 0,
+      "stop_steps": 0,
+      "unsafe_accepted_count": 0
+    },
+    {
+      "acceptance_rate": 0.6875,
+      "combo": "shoulder_relative+cbf_qp",
+      "dropped_rate": 0.3125,
+      "hold_steps": 5,
+      "min_hard_clearance_m": 0.014047069696928066,
+      "scenario": "long_occlusion",
+      "solver_failure_count": 0,
+      "stop_steps": 25,
+      "unsafe_accepted_count": 0
+    },
+    {
+      "acceptance_rate": 0.6875,
+      "combo": "sew_orientation+cbf_qp",
+      "dropped_rate": 0.3125,
+      "hold_steps": 5,
+      "min_hard_clearance_m": 0.014047069696928066,
+      "scenario": "long_occlusion",
+      "solver_failure_count": 0,
+      "stop_steps": 25,
+      "unsafe_accepted_count": 0
+    },
+    {
+      "acceptance_rate": 0.6875,
+      "combo": "shoulder_relative+cbf_qp",
+      "dropped_rate": 0.3125,
+      "hold_steps": 5,
+      "min_hard_clearance_m": 0.014047069696928066,
+      "scenario": "discontinuous_reacquisition",
+      "solver_failure_count": 0,
+      "stop_steps": 25,
+      "unsafe_accepted_count": 0
+    },
+    {
+      "acceptance_rate": 0.6875,
+      "combo": "sew_orientation+cbf_qp",
+      "dropped_rate": 0.3125,
+      "hold_steps": 5,
+      "min_hard_clearance_m": 0.014047069696928066,
+      "scenario": "discontinuous_reacquisition",
+      "solver_failure_count": 0,
+      "stop_steps": 25,
+      "unsafe_accepted_count": 0
+    }
+  ]
+}

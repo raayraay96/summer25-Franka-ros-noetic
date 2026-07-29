@@ -1,0 +1,18 @@
+{
+  "hostname": "cursor",
+  "os": "Linux-6.12.94+-x86_64-with-glibc2.39",
+  "python": "3.10.20",
+  "numpy": "1.24.4",
+  "date_utc": "2026-07-29T05:47:29.916230+00:00",
+  "seed": 42,
+  "replicates": 30,
+  "warmup": 3,
+  "smoke": false,
+  "command": "python3 benchmarks/benchmark_paired_v11.py --config /workspace/benchmarks/config/v11.yaml --replicates 30",
+  "latency_notes": {
+    "algorithm_and_pipeline_ms": "measured (safety_latency_*)",
+    "ros_callback_to_command_ms": "not_measured_no_ros",
+    "fake_hardware_publication_ms": "not_measured_no_ros"
+  },
+  "non_claims": "Not physical Franka; not full SEW-Mimic; CBF-QP kinematic filter only."
+}
