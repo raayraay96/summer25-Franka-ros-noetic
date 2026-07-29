@@ -32,6 +32,12 @@ class RetargetingConfig:
     image_height: int = 480
     # When landmarks are image-normalized 2.5D, z may be MediaPipe relative.
     treat_z_as_image_relative: bool = True
+    # De-weighting applied to the image-relative z channel before scaling into
+    # the workspace. This exists because MediaPipe z is a *relative* landmark
+    # depth (not metric) with a different, uncalibrated scale from the in-plane
+    # x/y; a value < 1 reduces the influence of that noisy relative-depth axis.
+    # It is a named, documented heuristic, NOT a metric or calibrated transform.
+    image_relative_z_scale: float = 0.5
 
 
 @runtime_checkable

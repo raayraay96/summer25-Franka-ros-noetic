@@ -130,10 +130,14 @@ class SEWOrientationRetargeter:
         # Chain displacement shoulder→wrist, scale-normalized for teleop workspace.
         chain = w - s
         if cfg.treat_z_as_image_relative:
-            # Map image-normalized SEW chain into workspace axes:
-            # image x → robot -y (camera facing robot is application-specific;
-            # we keep a simple configurable scale like shoulder_relative).
-            disp = np.array([chain[0], chain[1], chain[2] * 0.5], dtype=np.float64)
+            # Image-normalized SEW chain: x,y are normalized image coordinates
+            # and z is MediaPipe *relative* landmark depth (not metric, no
+            # camera-to-base calibration implied). The relative-depth axis is
+            # de-weighted by the named, documented ``image_relative_z_scale``.
+            disp = np.array(
+                [chain[0], chain[1], chain[2] * float(cfg.image_relative_z_scale)],
+                dtype=np.float64,
+            )
             if np.max(np.abs(disp[:2])) > 2.0:
                 disp[0] /= float(cfg.image_width)
                 disp[1] /= float(cfg.image_height)
@@ -157,6 +161,7 @@ class SEWOrientationRetargeter:
 
         status = RetargetingStatus.OK
         reason = "ok" if plane_ok else "ok_collinear_plane_soft"
+        z_relative = bool(cfg.treat_z_as_image_relative)
         return RetargetingTarget(
             position=position,
             orientation_xyzw=orientation,
@@ -171,6 +176,12 @@ class SEWOrientationRetargeter:
             timestamp=ts,
             joint_positions=None,
             ik_status="missing_ik_layer_feature_level_only",
+            source_frame="image_normalized" if z_relative else "human_shoulder",
+            target_frame="robot_base",
+            units="normalized_and_scaled" if z_relative else "metric_scaled",
+            z_is_relative=z_relative,
+            calibration_status="example_not_calibrated",
+            transform_provenance="configured_axis_scale_offset;image_relative_z_scale",
             metadata={
                 "strategy": self.name,
                 "inspired_by": "SEW-Mimic arXiv:2602.01632",

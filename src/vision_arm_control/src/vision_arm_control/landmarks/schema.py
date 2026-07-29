@@ -92,6 +92,13 @@ class RetargetingTarget:
     timestamp: float = 0.0
     joint_positions: Optional[np.ndarray] = None
     ik_status: str = "not_implemented"
+    # Explicit frame / unit contract (see docs/research/frame-contracts.md).
+    source_frame: str = "image_normalized"
+    target_frame: str = "robot_base"
+    units: str = "normalized_and_scaled"
+    z_is_relative: bool = True  # True => monocular relative depth, NOT metric
+    calibration_status: str = "example_not_calibrated"
+    transform_provenance: str = "configured_axis_scale_offset"
     metadata: dict = field(default_factory=dict)
 
     def is_commandable(self) -> bool:
