@@ -1,0 +1,27 @@
+# ROS 2 fake-hardware mode: cbf_qp + ros2_fake_hardware backend.
+# use_robot stays false; this targets Panda fake hardware / RViz simulation only.
+schema_version: "1.0"
+dt: 0.05
+initial_position: [0.45, 0.0, 0.45]
+retargeter:
+  name: shoulder_relative
+  treat_z_as_image_relative: true
+workspace:
+  x_min: 0.25
+  x_max: 0.75
+  y_min: -0.40
+  y_max: 0.40
+  z_min: 0.05
+  z_max: 0.80
+safety:
+  mode: cbf_qp
+  alpha: 4.0
+  workspace_margin_m: 0.03
+  per_axis_velocity_limit_mps: 0.20
+  stop_on_solver_failure: true
+  obstacles:
+    - id: table_edge
+      center: [0.55, 0.0, 0.10]
+      radius_m: 0.08
+      margin_m: 0.04
+backend: ros2_fake_hardware

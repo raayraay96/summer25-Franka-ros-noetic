@@ -29,6 +29,8 @@ jobs:
             --output results/v1.1-ci/qp-cross-validation-smoke.json
       - name: Config and documentation validation
         run: python scripts/validate_repository.py
+      - name: Teleop config-schema validation (fixtures)
+        run: python scripts/validate_config.py
       - name: Reproduce CPU baselines
         run: |
           python benchmarks/benchmark_mapping.py
