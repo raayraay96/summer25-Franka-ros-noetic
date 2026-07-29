@@ -85,3 +85,6 @@ ros2-cache/
 RCAC_SCRATCH/
 
 FRANKA_MODEL_DIR
+
+# Transient CI output (uploaded as artifact, never committed)
+results/v1.1-ci/

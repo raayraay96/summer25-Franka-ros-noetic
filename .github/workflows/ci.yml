@@ -20,8 +20,13 @@ jobs:
           cache-dependency-path: requirements-ci.txt
       - name: Install quality dependencies
         run: python -m pip install -r requirements-ci.txt
-      - name: Pure logic tests (mapping, safety, retargeting, CBF-QP, gating)
+      - name: Pure logic + property + oracle tests
         run: python -m pytest -q tests/
+      - name: QP solver cross-validation vs trusted oracle (smoke)
+        run: |
+          mkdir -p results/v1.1-ci
+          python scripts/qp_cross_validation.py --generic 400 --cbf 400 \
+            --output results/v1.1-ci/qp-cross-validation-smoke.json
       - name: Config and documentation validation
         run: python scripts/validate_repository.py
       - name: Reproduce CPU baselines
@@ -57,6 +62,13 @@ jobs:
         run: flake8 src/vision_arm_control/src tests benchmarks scripts ros2_ws/src/franka_teleop_ros2
       - name: History and large-object audit
         run: bash scripts/audit_git_history.sh
+      - name: Upload CI artifacts (benchmark + QP oracle smoke)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v1.1-ci-artifacts
+          path: results/v1.1-ci/
+          if-no-files-found: ignore
   noetic-container:
     runs-on: ubuntu-latest
     timeout-minutes: 30
