@@ -22,9 +22,13 @@ release name; S3 = minor.
 4. **Can the solver report success on a nonoptimal/infeasible point?** No:
    `optimal` requires KKT verification; projection is relabeled and off by
    default; infeasible returns `None`. Cross-validated on 6000 QPs (S-none).
-5. **Are benchmarks paired?** Not yet. Committed `results/v1.1/` are
-   single-replicate and are now **stale** vs the hardened solver (S2).
-6. **Are confidence intervals reproducible?** Not yet produced (S2).
+5. **Are benchmarks paired?** Yes now — `benchmark_paired_v11.py` replays one
+   immutable per-`(trajectory, replicate)` input (SHA-256 hashed) across all
+   methods; 30 replicates; 1800 runs; **0 unsafe accepted**; deterministic
+   replay match. The old single-replicate `results/v1.1/` are superseded (was
+   S2-C; now resolved for the pure-Python legs).
+6. **Are confidence intervals reproducible?** Yes — per-combo bootstrap 95% CIs
+   in `results/v1.1-hardening/paired/paired-summary.json` (seeded).
 7. **Does the video execute the actual repository runtime?** There is no new
    runtime video. Existing demos are pure-Python (honestly labeled) (S2).
 8. **Are reported joint values produced by verified IK?** No joint values are
@@ -52,20 +56,22 @@ cross-validated. (The model-vs-reality gap is real but is an explicit scope
 boundary, tracked as S2, not a defect in the modeled filter.)
 
 ### Severity 2 (blocks "simulation-validated" release name)
-- **S2-A** No end-to-end ROS 2 fake-hardware RViz recording from the real
+- **S2-A (open)** No end-to-end ROS 2 fake-hardware RViz recording from the real
   runtime. Blocker: no ROS 2 / MoveIt / display in the audit VM. Smallest
   repair: run the ROS 2 fake-hardware launch on a ROS 2 host (or in the Noetic
   container extended with a ROS 2 layer) and record with the diagnostics topic.
-- **S2-B** No verified simulated Panda IK / JointState evidence. Blocker: same.
-  Smallest repair: MoveIt `compute_ik` on a Panda fake-hardware bringup; keep
-  `sew_orientation` feature-only until then (already enforced in code).
-- **S2-C** Benchmark not paired, single replicate, empty `repeatability`, no
-  CIs, and now stale vs the hardened solver. Smallest repair: implement the
-  paired protocol in `paired-experiment-protocol.md` (immutable per-seed input
-  sequences replayed across methods; ≥30 reps; bootstrap CIs; per-trajectory).
-- **S2-D** No fault-injection results and no versioned config schema validation.
-- **S2-E** README/case-study still cite pre-hardening numbers; must be
-  re-audited only after S2-C produces fresh paired evidence.
+- **S2-B (open)** No verified simulated Panda IK / JointState evidence. Blocker:
+  same. Smallest repair: MoveIt `compute_ik` on a Panda fake-hardware bringup;
+  keep `sew_orientation` feature-only until then (already enforced in code).
+- **S2-C (resolved, pure-Python legs)** Benchmark is now paired, 30 replicates,
+  bootstrap CIs, per-trajectory, populated `repeatability`, 0 unsafe accepted,
+  fault injection. ROS callback/fake-hardware latency legs remain not measured.
+- **S2-D (resolved)** Versioned config-schema validation implemented
+  (`config_schema.py`, `scripts/validate_config.py`, CI step, 18 tests).
+  Fault-injection results are recorded (`fault-injection.json`).
+- **S2-E (resolved)** README re-audited to the fresh paired numbers; the stale
+  single-replicate table is explicitly marked superseded. (Case study still
+  references older framing — minor, S3.)
 
 ### Severity 3
 - Oracle cross-validation is CPU-bound (~28 s for 6000 problems); CI uses an
@@ -74,5 +80,9 @@ boundary, tracked as S2, not a defect in the modeled filter.)
 ## Release readiness
 
 **Not release-ready as `v1.1-simulation-validated`.** The mathematical safety
-core is now audited, corrected, and cross-validated (the highest-risk area), but
-S2-A through S2-E remain. The PR must stay **draft**.
+core is audited, corrected, and cross-validated; the benchmark is now paired and
+statistically characterized; config schema and fault injection are done
+(S2-C/D/E resolved). The two remaining blockers — **S2-A** (end-to-end ROS 2
+fake-hardware RViz demo) and **S2-B** (verified simulated Panda IK) — cannot be
+executed in this environment (no ROS 2 / MoveIt / display). The PR must stay
+**draft** until those run on a ROS host.

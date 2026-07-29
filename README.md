@@ -56,30 +56,38 @@ Model weights stay outside Git. See [`docs/model-setup.md`](docs/model-setup.md)
 
 ## Research-Informed v1.1
 
-Portfolio story: **research prototype → reproducible system → paper-informed retargeting and safety evaluation.** Independent post-program engineering (2026); not UW/HUMANS MOVE supervised work.
+Portfolio story: **research prototype → reproducible system → adversarially tested numerical methods → paired simulation evidence.** Independent post-program engineering (2026); not UW/HUMANS MOVE/Purdue supervised work.
 
 | Inspired by (not reproduced) | Actually implemented | Not implemented |
 |---|---|---|
 | SEW-Mimic orientation features ([arXiv:2602.01632](https://arxiv.org/abs/2602.01632)) | `sew_orientation` feature-level retargeter | Closed-form 7-DoF SEW joint solver |
-| CBF-QP safety filter ([arXiv:2604.11447](https://arxiv.org/abs/2604.11447)) | Experimental Cartesian `cbf_qp` | Formal certificates / dynamics CBF |
+| CBF-QP safety filter ([arXiv:2604.11447](https://arxiv.org/abs/2604.11447)) | Exact, KKT-verified Cartesian `cbf_qp` | Formal certificates / dynamics CBF |
 | AnyTeleop modular interfaces ([arXiv:2307.04577](https://arxiv.org/abs/2307.04577)) | Selectable retargeter / safety / backend | Multi-robot AnyTeleop stack |
 | Vision shared-control teleop ([arXiv:2508.14994](https://arxiv.org/abs/2508.14994)) | Confidence gating + hold/recovery | Quadruped platform / their planner |
 
-**Default remains** `shoulder_relative` + `reject`/`clamp` + `dry_run`. New modes are opt-in via YAML.
+**Default remains** `shoulder_relative` + `reject`/`clamp` + `dry_run`. New modes are opt-in via a versioned, validated YAML schema.
 
-| Combo (Scholar host) | Map ms | Safety ms | Path m | Interv. % |
-|---|---:|---:|---:|---:|
-| shoulder_relative + reject | 0.033 | 0.003 | 0.310 | 1.4 |
-| sew_orientation + reject | 0.218 | 0.004 | 0.315 | 1.4 |
-| shoulder_relative + cbf_qp | 0.039 | 0.360 | 0.341 | 85.1 |
-| sew_orientation + cbf_qp | 0.234 | 0.369 | 0.342 | 84.9 |
+**Verified safety core (this branch, simulation only):**
+- CBF-QP cross-validated against a trusted OSQP + SciPy oracle — **6,000 seeded QPs, 0 mismatches**, KKT-verified optimum ([`qp-correctness-audit.md`](docs/research/qp-correctness-audit.md)).
+- Paired **30-replicate** benchmark on the hardened pipeline (identical inputs replayed across all methods) — **1,800 runs, 0 unsafe accepted next states, 0 solver failures**, deterministic replay match; **10 fault-injection scenarios, all 0 unsafe** ([`simulation-validation-results.md`](docs/research/simulation-validation-results.md)).
+
+| Combo | Safety ms | Interv. % (mean [95% CI]) | Unsafe accepted |
+|---|---:|---|---:|
+| shoulder_relative + reject | 0.001 | 1.4 [0.9, 1.8] | 0 |
+| sew_orientation + reject | 0.002 | 1.4 [0.9, 1.8] | 0 |
+| shoulder_relative + cbf_qp | 8.79 | 86.6 [85.0, 88.2] | 0 |
+| sew_orientation + cbf_qp | 8.77 | 86.2 [84.5, 87.9] | 0 |
+
+30 replicates × 10 trajectories, paired inputs; Cursor VM, Python 3.10. `cbf_qp` latency is the exact active-set solver cost; the high intervention % is a behavior characterization under a tight barrier model, **not** a superiority claim.
 
 ```bash
-python3 benchmarks/benchmark_retargeting_v11.py --config benchmarks/config/v11.yaml --output results/v1.1
+python scripts/qp_cross_validation.py                        # 6000 QPs vs OSQP/linprog (0 mismatches)
+python benchmarks/benchmark_paired_v11.py --replicates 30    # paired evidence -> results/v1.1-hardening/paired/
+python scripts/validate_config.py                            # versioned config schema
 ```
 
-Evidence: [`docs/research/`](docs/research/) · Protocol · Results · Case study: [`docs/case-study-v1.1.md`](docs/case-study-v1.1.md) · Media: [`docs/media/v1.1/`](docs/media/v1.1/)  
-**Simulation-only for v1.1 method demos.** No physical Franka claim. No metric-depth claim. No safety certification.
+Evidence: [`docs/research/`](docs/research/) (baseline, QP audit, frame contracts, simulation-validation results, [claims ledger](docs/research/claims-ledger.md), [red-team review](docs/research/red-team-review-v1.1.md), [final limitations](docs/research/v1.1-final-limitations.md)) · Case study: [`docs/case-study-v1.1.md`](docs/case-study-v1.1.md) · Media: [`docs/media/v1.1/`](docs/media/v1.1/)  
+**Simulation-only.** No physical Franka, no verified joint IK, no metric depth, no safety certification. The earlier single-replicate Scholar table (pre-hardening) is **superseded** by the paired results above.
 
 ## Demo
 
