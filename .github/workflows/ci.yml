@@ -1,7 +1,7 @@
 name: CI
 on:
   push:
-    branches: [main, portfolio-v2, research-retargeting-v1.1]
+    branches: [main, portfolio-v2, research-retargeting-v1.1, portfolio-observability-mvp]
   pull_request:
     branches: [main]
 permissions:
@@ -64,6 +64,14 @@ jobs:
         run: flake8 src/vision_arm_control/src tests benchmarks scripts ros2_ws/src/franka_teleop_ros2
       - name: History and large-object audit
         run: bash scripts/audit_git_history.sh
+      - name: Write quality summary
+        if: always()
+        run: |
+          echo "## Franka portfolio CI" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Pure-Python tests and telemetry queue tests" >> "$GITHUB_STEP_SUMMARY"
+          echo "- 800-case QP oracle smoke audit" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Benchmark, config, documentation, formatting, and history checks" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Status: **${{ job.status }}**" >> "$GITHUB_STEP_SUMMARY"
       - name: Upload CI artifacts (benchmark + QP oracle smoke)
         if: always()
         uses: actions/upload-artifact@v4
@@ -77,6 +85,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build ROS Noetic image
-        run: docker build -f Dockerfile.noetic -t franka-teleop:noetic .
+        run: docker build -t franka-teleop:noetic .
       - name: Run catkin and dry-run launch smoke test
         run: docker run --rm franka-teleop:noetic bash scripts/ci_smoke_noetic.sh
