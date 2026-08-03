@@ -1,0 +1,14 @@
+services:
+  noetic-sim:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: franka-teleop:noetic
+    command: ["bash", "scripts/ci_smoke_noetic.sh"]
+    environment:
+      TELEMETRY_ENABLED: ${TELEMETRY_ENABLED:-false}
+      TELEMETRY_DRY_RUN: ${TELEMETRY_DRY_RUN:-true}
+      SUPABASE_URL: ${SUPABASE_URL:-}
+      SUPABASE_TELEMETRY_KEY: ${SUPABASE_TELEMETRY_KEY:-}
+      SUPABASE_TELEMETRY_TABLE: ${SUPABASE_TELEMETRY_TABLE:-franka_telemetry}
+      TELEMETRY_SOURCE: ${TELEMETRY_SOURCE:-ros1-noetic-compose}
