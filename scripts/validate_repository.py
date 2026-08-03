@@ -21,11 +21,18 @@ for target in links:
         continue
     assert (ROOT / clean).exists(), f"README link does not resolve: {target}"
 for required in [
+    "Dockerfile",
+    "Dockerfile.noetic",
+    "docker-compose.yml",
+    "Makefile",
+    ".env.example",
     "docs/architecture.svg",
     "docs/architecture-v1.1.svg",
     "docs/topic-graph.svg",
     "docs/frame-tree.svg",
     "docs/repository-audit.md",
+    "docs/operator-runbook.md",
+    "docs/telemetry.md",
     "docs/safety.md",
     "docs/calibration.md",
     "docs/model-setup.md",
@@ -38,6 +45,7 @@ for required in [
     "docs/research/limitations-v1.1.md",
     "docs/case-study-v1.1.md",
     "docs/references.bib",
+    "sql/telemetry_schema.sql",
     "CITATION.cff",
     "LICENSE",
 ]:
