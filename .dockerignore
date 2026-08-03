@@ -14,3 +14,10 @@ __pycache__
 *.onnx
 models
 RCAC_SCRATCH
+
+# Never send local credentials into the Docker build context.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
