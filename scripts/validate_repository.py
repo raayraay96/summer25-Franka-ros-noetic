@@ -50,6 +50,9 @@ for required in [
     "LICENSE",
 ]:
     assert (ROOT / required).exists(), required
+assert (ROOT / "Dockerfile").read_text() == (ROOT / "Dockerfile.noetic").read_text(), (
+    "Dockerfile and Dockerfile.noetic must stay identical"
+)
 for path in ROOT.rglob("*"):
     if not path.is_file() or ".git" in path.parts:
         continue
