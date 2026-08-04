@@ -1,7 +1,7 @@
 name: CI
 on:
   push:
-    branches: [main, portfolio-v2, research-retargeting-v1.1, portfolio-observability-mvp]
+    branches: [main]
   pull_request:
     branches: [main]
 permissions:
