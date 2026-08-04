@@ -59,7 +59,7 @@ jobs:
           print(f"schema ok: {len(rows)} rows, combos={list(summary['aggregate_by_combo'])}")
           PY
       - name: Black
-        run: black --check src/vision_arm_control/src tests benchmarks scripts ros2_ws/src/franka_teleop_ros2
+        run: black --diff --check src/vision_arm_control/src tests benchmarks scripts ros2_ws/src/franka_teleop_ros2
       - name: Flake8
         run: flake8 src/vision_arm_control/src tests benchmarks scripts ros2_ws/src/franka_teleop_ros2
       - name: History and large-object audit
