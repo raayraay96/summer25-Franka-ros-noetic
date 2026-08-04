@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Validate configs, launch XML, README links, and portfolio hygiene without ROS."""
 from __future__ import annotations
+
 import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
+
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -61,7 +63,13 @@ for path in ROOT.rglob("*"):
         raise AssertionError(f"forbidden binary in working tree: {path}")
 placeholder = "your" + "username"
 for path in ROOT.rglob("*"):
-    if path.is_file() and path.suffix.lower() not in {".gif", ".mp4", ".png", ".jpg", ".jpeg"}:
+    if path.is_file() and path.suffix.lower() not in {
+        ".gif",
+        ".mp4",
+        ".png",
+        ".jpg",
+        ".jpeg",
+    }:
         assert placeholder not in path.read_text(errors="ignore"), path
 assert len(readme.splitlines()) < 400, "README must remain under 400 lines"
 print(f"validated {len(links)} README links")
