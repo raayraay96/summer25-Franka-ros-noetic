@@ -8,16 +8,18 @@
   <arg name="use_moveit" default="false"/>
   <arg name="use_mock_landmarks" default="true"/>
   <arg name="headless" default="true"/>
+  <arg name="enable_telemetry" default="false"/>
+  <arg name="telemetry_dry_run" default="true"/>
 
   <rosparam file="$(find vision_arm_control)/config/mapping.yaml" command="load"/>
   <rosparam file="$(find vision_arm_control)/config/safety.yaml" command="load"/>
   <rosparam file="$(find vision_arm_control)/config/controller.yaml" command="load"/>
   <rosparam file="$(find vision_arm_control)/config/camera_intrinsics.yaml" command="load"/>
 
-  <!-- Optional external stacks — only when installed and requested -->
+  <!-- Optional external stacks, only when installed and requested. -->
   <group if="$(arg use_gazebo)">
     <include file="$(find franka_gazebo)/launch/panda.launch" if="$(arg use_gazebo)">
-      <!-- May fail if franka_gazebo is not installed; keep use_gazebo:=false by default -->
+      <!-- May fail if franka_gazebo is not installed; keep use_gazebo:=false by default. -->
     </include>
   </group>
 
@@ -36,6 +38,14 @@
     <param name="allow_real_robot" value="false"/>
     <param name="require_deadman" value="false"/>
   </node>
+
+  <group if="$(arg enable_telemetry)">
+    <node pkg="vision_arm_control" type="telemetry_node.py" name="telemetry_node" output="screen">
+      <param name="enabled" value="true"/>
+      <param name="dry_run" value="$(arg telemetry_dry_run)"/>
+      <param name="input_topic" value="/safety_monitor_node/telemetry"/>
+    </node>
+  </group>
 
   <node pkg="vision_arm_control" type="robot_controller_node.py" name="robot_controller_node" output="screen">
     <param name="mode" value="simulation"/>

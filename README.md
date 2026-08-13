@@ -5,115 +5,65 @@
 [![CI](https://github.com/raayraay96/summer25-Franka-ros-noetic/actions/workflows/ci.yml/badge.svg)](https://github.com/raayraay96/summer25-Franka-ros-noetic/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Single-webcam EE position teleop for Franka Panda with shoulder-relative mapping, workspace safety, and dry-run default.**
+**A research teleoperation prototype hardened into a reproducible, safety-gated, testable Linux/ROS system with automated validation and optional asynchronous Postgres telemetry.**
 
 <p align="center">
   <img src="docs/media/franka-rviz-dry-run.gif" alt="Mock wrist landmarks driving a Franka Panda end-effector target in RViz 2 fake-hardware simulation" width="820">
 </p>
 
-Developed initially during the **HUMANS MOVE Program at the University of Wyoming**. After the program concluded, Eric Raymond independently refactored the research prototype into a modular, testable, safety-gated portfolio system. The verified hero demo uses mock landmarks and RViz 2 fake hardware on Purdue Scholar; it is not physical-robot proof.
+The system maps webcam or mock human wrist landmarks to Franka Panda end-effector targets, rejects unsafe commands before the controller boundary, and defaults to dry-run or simulation behavior. The verified public evidence uses synthetic inputs and RViz 2 fake hardware. It is not physical-robot validation or safety certification.
 
-## Contents
+Developed initially during the **HUMANS MOVE Program at the University of Wyoming**. After the program concluded, Eric Raymond independently refactored the prototype into the portfolio system documented here. The completed [portfolio readiness audit](docs/portfolio-audit.md) records the verification performed, the remediation applied, and the remaining physical-deployment boundaries.
 
-- [60-Second Run (No Robot)](#60-second-run-no-robot)
-- [Research-Informed v1.1](#research-informed-v11)
-- [Demo](#demo)
-- [Architecture and Technical Design](#architecture)
-- [Results](#results)
-- [Limitations](#limitations)
-- [Roadmap, Contribution, and Citation](#roadmap)
+## Engineering Highlights
 
-## 60-Second Run (No Robot)
+- Reproducible ROS Noetic environment through Docker, Compose, pinned Python dependencies, and simple `make` commands
+- Modular perception, mapping, safety, controller, mock-input, and telemetry boundaries
+- Dry-run defaults, workspace gating, pose timeouts, E-stop handling, dead-man hooks, and explicit real-robot opt-in
+- Pure-Python unit/property tests plus containerized catkin and launch smoke tests in GitHub Actions
+- Trusted-oracle QP cross-validation, paired simulation benchmarks, fault injection, and committed evidence
+- Non-blocking telemetry queue for safety decisions, timeouts, E-stop events, latency, and node heartbeat data
+- Runbooks, claims ledger, evidence provenance, calibration status, and visible limitations
 
-```bash
-git clone https://github.com/raayraay96/summer25-Franka-ros-noetic.git && cd summer25-Franka-ros-noetic
-```
+## Quickstart
 
-```bash
-docker build -f Dockerfile.noetic -t franka-teleop:noetic .
-```
+### One-command simulation proof
 
 ```bash
-docker run --rm franka-teleop:noetic bash scripts/ci_smoke_noetic.sh
+git clone https://github.com/raayraay96/summer25-Franka-ros-noetic.git
+cd summer25-Franka-ros-noetic
+make sim
 ```
 
-The third command runs pure-logic tests, confirms the catkin package, and smoke-tests `simulation.launch` with mock landmarks and no robot. Native developer checks also work without ROS:
+`make sim` builds the ROS Noetic container, runs the pure-Python tests, confirms the catkin package, and smoke-tests `simulation.launch` with mock landmarks. It does not connect to a physical Franka.
+
+### Local quality gate without ROS
 
 ```bash
-python3 -m pip install -r requirements.txt
-python3 -m pytest -q tests/
+make install
+make ci
 ```
 
-ROS Noetic launch paths inside the container or a configured Noetic workspace:
+Useful commands:
 
 ```bash
-roslaunch vision_arm_control simulation.launch
-roslaunch vision_arm_control mimicry.launch use_mock_landmarks:=true use_robot:=false
-roslaunch vision_arm_control perception_only.launch headless:=true
+make help             # list supported workflows
+make test             # pure-Python tests
+make lint             # Black + Flake8
+make qp-smoke         # CI-sized trusted-oracle check
+make full-validation  # 6,000 QPs + 30-replicate benchmark
+make sim-compose      # same simulation path through Compose
 ```
 
-Model weights stay outside Git. See [`docs/model-setup.md`](docs/model-setup.md) for `FRANKA_MODEL_DIR` and Purdue Scholar setup.
+Model weights stay outside Git. See [`docs/model-setup.md`](docs/model-setup.md). Common failures are covered in the [`operator runbook`](docs/operator-runbook.md).
 
-## Research-Informed v1.1
+## What This Proves
 
-Portfolio story: **research prototype → reproducible system → adversarially tested numerical methods → paired simulation evidence.** Independent post-program engineering (2026); not UW/HUMANS MOVE/Purdue supervised work.
-
-| Inspired by (not reproduced) | Actually implemented | Not implemented |
-|---|---|---|
-| SEW-Mimic orientation features ([arXiv:2602.01632](https://arxiv.org/abs/2602.01632)) | `sew_orientation` feature-level retargeter | Closed-form 7-DoF SEW joint solver |
-| CBF-QP safety filter ([arXiv:2604.11447](https://arxiv.org/abs/2604.11447)) | Exact, KKT-verified Cartesian `cbf_qp` | Formal certificates / dynamics CBF |
-| AnyTeleop modular interfaces ([arXiv:2307.04577](https://arxiv.org/abs/2307.04577)) | Selectable retargeter / safety / backend | Multi-robot AnyTeleop stack |
-| Vision shared-control teleop ([arXiv:2508.14994](https://arxiv.org/abs/2508.14994)) | Confidence gating + hold/recovery | Quadruped platform / their planner |
-
-**Default remains** `shoulder_relative` + `reject`/`clamp` + `dry_run`. New modes are opt-in via a versioned, validated YAML schema.
-
-**Verified safety core (this branch, simulation only):**
-- CBF-QP cross-validated against a trusted OSQP + SciPy oracle — **6,000 seeded QPs, 0 mismatches**, KKT-verified optimum ([`qp-correctness-audit.md`](docs/research/qp-correctness-audit.md)).
-- Paired **30-replicate** benchmark on the hardened pipeline (identical inputs replayed across all methods) — **1,800 runs, 0 unsafe accepted next states, 0 solver failures**, deterministic replay match; **10 fault-injection scenarios, all 0 unsafe** ([`simulation-validation-results.md`](docs/research/simulation-validation-results.md)).
-
-| Combo | Safety ms | Interv. % (mean [95% CI]) | Unsafe accepted |
-|---|---:|---|---:|
-| shoulder_relative + reject | 0.001 | 1.4 [0.9, 1.8] | 0 |
-| sew_orientation + reject | 0.002 | 1.4 [0.9, 1.8] | 0 |
-| shoulder_relative + cbf_qp | 8.79 | 86.6 [85.0, 88.2] | 0 |
-| sew_orientation + cbf_qp | 8.77 | 86.2 [84.5, 87.9] | 0 |
-
-30 replicates × 10 trajectories, paired inputs; Cursor VM, Python 3.10. `cbf_qp` latency is the exact active-set solver cost; the high intervention % is a behavior characterization under a tight barrier model, **not** a superiority claim.
-
-```bash
-python scripts/qp_cross_validation.py                        # 6000 QPs vs OSQP/linprog (0 mismatches)
-python benchmarks/benchmark_paired_v11.py --replicates 30    # paired evidence -> results/v1.1-hardening/paired/
-python scripts/validate_config.py                            # versioned config schema
-```
-
-Evidence: [`docs/research/`](docs/research/) (baseline, QP audit, frame contracts, simulation-validation results, [claims ledger](docs/research/claims-ledger.md), [red-team review](docs/research/red-team-review-v1.1.md), [final limitations](docs/research/v1.1-final-limitations.md)) · Case study: [`docs/case-study-v1.1.md`](docs/case-study-v1.1.md) · Media: [`docs/media/v1.1/`](docs/media/v1.1/)  
-**Simulation-only.** No physical Franka, no verified joint IK, no metric depth, no safety certification. The earlier single-replicate Scholar table (pre-hardening) is **superseded** by the paired results above.
-
-## Demo
-
-| Asset | Label | Status |
-|---|---|---|
-| [GIF](docs/media/franka-rviz-dry-run.gif) · [MP4](docs/media/franka-rviz-dry-run.mp4) | Mock wrist input → mapped target → safety gate → RViz 2 Panda | **Verified** Scholar fake-hardware run; no Franka connected |
-| [GIF](docs/media/safety-workspace-violation.gif) · [MP4](docs/media/safety-workspace-violation.mp4) | Workspace violation → command rejected | Generated from the repository safety utility; synthetic input, no ROS/hardware |
-| [GIF](docs/media/perception-headless-relative-depth.gif) · [MP4](docs/media/perception-headless-relative-depth.mp4) | Headless landmark JSON + relative-depth visualization | Synthetic schema demonstration; not a camera or hardware benchmark |
-| [Screenshot 1](https://github.com/user-attachments/assets/b5c32aea-6236-45f5-b62f-182bf95e7df9) · [Screenshot 2](https://github.com/user-attachments/assets/ddf8d767-7f2e-402e-ac0e-d0cc13ebf851) | Research-period depth output | Perception-only, not hardware proof |
-| Planned | Gazebo + MoveIt collision-aware recording | Not yet validated; the dry-run RViz video above is the current proof |
-| [v1.1 GIFs/MP4s](docs/media/v1.1/) | Pure-Python retargeting / CBF / gating demos | **Verified** synthetic trajectories; not RViz/Gazebo re-records |
-
-Demo provenance, labels, and reproduction commands: [`docs/media/README.md`](docs/media/README.md) · [`docs/media/v1.1/README.md`](docs/media/v1.1/README.md). ROS 2 Scholar evidence: [`docs/ros2-simulation.md`](docs/ros2-simulation.md) and [`results/ros2/`](results/ros2/).
-
-## Key Features
-
-- Modular nodes for camera, pose, depth, mapping, safety, controller, and mock input
-- Timestamped JSON MediaPipe landmarks instead of opaque in-process state
-- Shoulder-relative end-effector position mapping with explicit normalized → pixel → camera → base stages
-- Workspace rejection/clamping, velocity limiting, pose timeout, stale-command checks, E-stop, and dead-man hooks
-- `dry_run` and `use_robot:=false` defaults across configuration and launch files
-- MonoDepth2-style `1 / disparity` visualization labeled as **relative**, never metric
-- YAML configuration for camera, mapping, models, safety, and controller behavior
-- Pure-Python tests that run without ROS plus ROS Noetic container and ROS 2 Scholar simulation paths
-- Reproducible CPU benchmarks with committed evidence and unmeasured physical metrics left unclaimed
-- Model weights, rosbag files, build outputs, and local paths excluded from Git
+- A fragile research prototype can be converted into an understandable, reproducible system.
+- Safety-critical decisions can be isolated behind explicit interfaces and conservative defaults.
+- Numerical and simulation claims can be tied to automated tests, artifacts, and reproducible commands.
+- Linux/ROS workloads can be containerized and validated through CI without hiding environment limitations.
+- Operational metrics can leave the control path through a bounded asynchronous queue and land in PostgreSQL.
 
 ## Architecture
 
@@ -128,92 +78,140 @@ webcam / rosbag / mock landmarks
  shoulder-relative EE target      relative depth only
               │
               ▼
-      safety_monitor_node
- workspace · velocity · timeout · E-stop · dead-man
-              │ accepted command
-              ▼
-     robot_controller_node
-       dry_run by default
+      safety_monitor_node ── telemetry JSON ──► telemetry_node
+ workspace · timeout · E-stop                 bounded async queue
+              │ accepted command                        │
+              ▼                                         ▼
+     robot_controller_node                    Supabase/PostgreSQL
+       dry_run by default                       optional, off by default
 ```
+
+| Component | Responsibility |
+|---|---|
+| `pose_estimator_node` | MediaPipe landmarks with timestamped JSON output |
+| `human_to_robot_mapper_node` | Shoulder-relative mapping to an end-effector position target |
+| `safety_monitor_node` | Workspace, timeout, E-stop, dead-man, and mode gating |
+| `robot_controller_node` | Dry-run logging or explicit simulation/robot boundary |
+| `mock_landmark_publisher` | Deterministic synthetic input for CI and demos |
+| `telemetry_node` | Bounded background delivery of safety and heartbeat metrics |
 
 Visual references: [architecture](docs/architecture.svg) · [topic graph](docs/topic-graph.svg) · [frame tree](docs/frame-tree.svg) · [ROS 2 simulation](docs/ros2-architecture.svg).
 
-## Technical Design
+## Validation
 
-| Node | Role |
-|---|---|
-| `camera_node` | Publishes webcam frames as compressed images |
-| `pose_estimator_node` | Runs MediaPipe and publishes timestamped landmark JSON |
-| `depth_estimator_node` | Produces optional MonoDepth2-style relative depth visualization |
-| `human_to_robot_mapper_node` | Maps shoulder-relative wrist motion to an EE position target |
-| `safety_monitor_node` | Rejects unsafe, stale, or disabled commands before control |
-| `robot_controller_node` | Logs dry-run targets or crosses an explicit simulation/robot boundary |
-| `mock_landmark_publisher` | Supplies deterministic synthetic landmarks for CI and demos |
+### Safety and numerical evidence
 
-The design is **end-effector position teleoperation**, not full pose or joint mimicry. Calibration status and frame assumptions are explicit in [`docs/calibration.md`](docs/calibration.md); real-robot requirements are explicit in [`docs/safety.md`](docs/safety.md).
+- **6,000 seeded QPs, 0 mismatches** against an OSQP + SciPy trusted oracle, with KKT verification ([audit](docs/research/qp-correctness-audit.md)).
+- **1,800 paired simulation runs, 0 unsafe accepted next states, 0 solver failures** across 30 replicates and identical replayed inputs ([results](docs/research/simulation-validation-results.md)).
+- **10 fault-injection scenarios, 0 unsafe outcomes** in the recorded simulation evidence.
 
-## Results
+| Combo | Safety ms | Intervention % mean [95% CI] | Unsafe accepted |
+|---|---:|---:|---:|
+| shoulder_relative + reject | 0.001 | 1.4 [0.9, 1.8] | 0 |
+| sew_orientation + reject | 0.002 | 1.4 [0.9, 1.8] | 0 |
+| shoulder_relative + cbf_qp | 8.79 | 86.6 [85.0, 88.2] | 0 |
+| sew_orientation + cbf_qp | 8.77 | 86.2 [84.5, 87.9] | 0 |
 
-Only reproduced measurements are listed. CPU values measure code stages, not camera inference, network transport, or physical Franka motion.
+The high CBF-QP intervention rate is a behavior measurement under a tight barrier model, not a superiority claim.
+
+### Reproduction commands
+
+```bash
+make qp-audit
+make benchmark-full
+python scripts/validate_config.py
+```
+
+The pull-request workflow runs an 800-case QP subset and benchmark smoke path. The manually triggered [`full-validation.yml`](.github/workflows/full-validation.yml) runs the full evidence commands and uploads artifacts.
+
+### Additional measured results
 
 | Metric | Result | Environment | Evidence |
 |---|---:|---|---|
-| Mapping stage latency | **0.0049 ms mean; 0.0080 ms p95; n=5,000** | x86_64 audit host, Python 3.13.13, no ROS | [`results/mapping_benchmark.json`](results/mapping_benchmark.json) |
-| Map + filter + workspace latency | **0.0298 ms mean; 0% rejects; n=2,000** | x86_64 audit host, Python 3.13.13, no ROS | [`results/latency_benchmark.json`](results/latency_benchmark.json) |
-| ROS 2 target / command / joint / safety rate | **~20 Hz** | Purdue Scholar, RViz 2 fake hardware | [`results/ros2/topic-rates.json`](results/ros2/topic-rates.json) |
-| ROS 2 joint path travel | **6.33 rad over 12 s** | Mock trajectory, geometric IK approximation | [`results/ros2/run-summary.json`](results/ros2/run-summary.json) |
-| Max single-joint excursion | **1.02 rad** | Recorded Scholar demo window | [`results/ros2/recording-metrics.json`](results/ros2/recording-metrics.json) |
-| Physical Franka tracking error | **Not yet measured** | Calibrated camera + lab robot required | — |
-| End-to-end physical latency | **Not yet measured** | Camera + network + controller + robot required | — |
+| Mapping stage latency | **0.0049 ms mean; 0.0080 ms p95; n=5,000** | x86_64, Python 3.13.13, no ROS | [`mapping_benchmark.json`](results/mapping_benchmark.json) |
+| Map + filter + workspace latency | **0.0298 ms mean; 0% rejects; n=2,000** | x86_64, Python 3.13.13, no ROS | [`latency_benchmark.json`](results/latency_benchmark.json) |
+| ROS 2 target / command / joint / safety rate | **about 20 Hz** | Purdue Scholar, RViz 2 fake hardware | [`topic-rates.json`](results/ros2/topic-rates.json) |
+| Physical Franka tracking error | **Not measured** | Physical lab setup required | — |
+| End-to-end physical latency | **Not measured** | Camera, controller, and robot required | — |
 
-Reproduce the CPU measurements:
+## Demo Evidence
+
+| Asset | Demonstrates | Status |
+|---|---|---|
+| [GIF](docs/media/franka-rviz-dry-run.gif) · [MP4](docs/media/franka-rviz-dry-run.mp4) | Mock wrist input to mapped target, safety gate, and RViz Panda | Verified fake-hardware run; no Franka connected |
+| [GIF](docs/media/safety-workspace-violation.gif) · [MP4](docs/media/safety-workspace-violation.mp4) | Workspace violation and command rejection | Synthetic input; no ROS hardware |
+| [GIF](docs/media/perception-headless-relative-depth.gif) · [MP4](docs/media/perception-headless-relative-depth.mp4) | Landmark JSON and relative-depth visualization | Synthetic schema demonstration |
+| [v1.1 media](docs/media/v1.1/) | Retargeting, CBF, and gating trajectories | Verified pure-Python synthetic runs |
+
+Provenance and reproduction commands: [`docs/media/README.md`](docs/media/README.md) · [`docs/media/v1.1/README.md`](docs/media/v1.1/README.md) · [`docs/ros2-simulation.md`](docs/ros2-simulation.md).
+
+## Telemetry and PostgreSQL
+
+Telemetry is optional and disabled by default. The safety node emits local JSON metrics; `telemetry_node` places them on a bounded queue and performs PostgREST inserts on a background thread. A slow or unavailable database cannot block the ROS safety callback.
 
 ```bash
-python benchmarks/benchmark_mapping.py
-python benchmarks/benchmark_latency.py
+roslaunch vision_arm_control simulation.launch enable_telemetry:=true telemetry_dry_run:=true
 ```
 
-## Challenges & Engineering Decisions
+The dry-run command logs records locally. For Supabase setup, schema, environment variables, security constraints, and verification SQL, see [`docs/telemetry.md`](docs/telemetry.md) and [`sql/telemetry_schema.sql`](sql/telemetry_schema.sql).
 
-The preserved audit in [`docs/repository-audit.md`](docs/repository-audit.md) records the prototype issues and the portfolio fixes:
+## Research-Informed v1.1
 
-1. **Normalized image coordinates were treated as `base_link` targets.** Added an explicit frame pipeline and shoulder-relative mode instead of presenting image-space values as robot coordinates.
-2. **Depth was computed but not fused into control.** Kept it visualization-only and documented `relative_depth = 1 / disparity` as non-metric.
-3. **The incomplete `ikpy` chain was unsafe as a primary controller.** Replaced it with a dry-run boundary and a separately labeled geometric-IK simulation path.
-4. **Model weights and bags polluted the repository history.** Rebuilt the public branches from a clean root, externalized models, and added CI history guards.
-5. **Hardcoded machine paths prevented reproduction.** Replaced them with ROS parameters, container paths, and `FRANKA_MODEL_DIR`.
+The default remains `shoulder_relative` + `reject`/`clamp` + `dry_run`. Research-informed modes are versioned, validated, and opt-in.
+
+| Inspired by, not reproduced | Implemented here | Not implemented |
+|---|---|---|
+| SEW-Mimic orientation features ([paper](https://arxiv.org/abs/2602.01632)) | `sew_orientation` feature-level retargeter | Closed-form 7-DoF SEW joint solver |
+| CBF-QP safety filtering ([paper](https://arxiv.org/abs/2604.11447)) | Exact, KKT-verified Cartesian `cbf_qp` | Formal certificates or dynamics CBF |
+| AnyTeleop modular interfaces ([paper](https://arxiv.org/abs/2307.04577)) | Selectable retargeter, safety, and backend interfaces | Multi-robot AnyTeleop stack |
+| Vision shared control ([paper](https://arxiv.org/abs/2508.14994)) | Confidence gating, hold, and recovery | Their quadruped platform or planner |
+
+Evidence: [`docs/research/`](docs/research/) · [claims ledger](docs/research/claims-ledger.md) · [red-team review](docs/research/red-team-review-v1.1.md) · [case study](docs/case-study-v1.1.md).
+
+## Key Engineering Decisions
+
+1. **Image coordinates were being treated as robot-frame targets.** The refactor added an explicit normalized-to-pixel-to-camera-to-base mapping contract and a shoulder-relative mode.
+2. **Relative depth existed but was not valid metric control input.** It remains visualization-only and is labeled as `1 / disparity`, not physical distance.
+3. **An incomplete IK chain was not acceptable as a primary controller.** It was replaced by a dry-run boundary and separately labeled simulation paths.
+4. **Weights, bags, and build outputs damaged reproducibility.** They were removed from the public history and blocked by repository audits.
+5. **Machine-specific paths prevented reuse.** They were replaced with ROS parameters, container paths, and `FRANKA_MODEL_DIR`.
+6. **Telemetry could not be allowed to affect control timing.** The implementation uses local publication plus a bounded asynchronous writer with drop/failure accounting.
+
+The preserved initial audit is in [`docs/repository-audit.md`](docs/repository-audit.md).
 
 ## Limitations
 
-- Relative monocular depth is not metric distance and is not used as a validated robot range measurement.
-- Camera intrinsics and camera-to-base transforms remain `status: example` until measured calibration is recorded.
-- ROS Noetic and Ubuntu 20.04 are end-of-life foundations; the ROS 2 path is a simulation proof, not full hardware parity.
-- Gazebo + MoveIt collision-aware execution has not been validated on the audit host.
-- No physical Franka was available for CI or re-validation of this portfolio branch.
-- Geometric IK in the Scholar demo is an approximation, not an industrial Franka controller.
-- Software bounds, timeouts, and E-stop topics are not a safety certification or a substitute for Franka Desk, a physical E-stop, a dead-man control, and lab procedures.
+- All public safety and benchmark claims are simulation or pure-Python evidence, not physical Franka validation.
+- Software checks are not safety certification and do not replace Franka Desk, a physical E-stop, dead-man control, or lab procedures.
+- Relative monocular depth is not metric and is not used as validated robot range data.
+- Camera intrinsics and camera-to-base transforms remain examples until measured calibration is recorded.
+- ROS Noetic and Ubuntu 20.04 are end-of-life technical debt. The ROS 2 path is a simulation proof, not full hardware parity.
+- Gazebo + MoveIt collision-aware execution has not been validated on every supported host.
+- The direct Supabase writer is an edge-host portfolio MVP. Production ingestion should use a least-privilege authenticated service boundary.
+
+## What I Learned
+
+- Harden the execution path before expanding the algorithm surface.
+- Make unsafe or unverified behavior impossible by default, not merely discouraged in documentation.
+- Separate measured evidence from planned work and keep the exact reproduction commands beside each claim.
+- Treat containers, CI, telemetry, runbooks, and failure handling as part of the system rather than portfolio decoration.
 
 ## Roadmap
 
 | State | Work |
 |---|---|
-| **Implemented** | Modular ROS1 nodes, pure-logic tests, pinned environment, Noetic container, CI, safety gates, clean history, ROS 2 RViz demo, v1.1 SEW-inspired retargeting + CBF-QP + benchmarks |
-| **In progress** | Measured camera calibration, RViz re-record with selectable v1.1 strategies, MoveIt planning integration |
-| **Planned** | RGB-D metric mapping, verified SEW IK adapter, Gazebo collision demo, physical Franka re-validation |
+| Implemented | Modular ROS1 nodes, tests, pinned environment, Docker, CI, safety gates, ROS 2 RViz evidence, v1.1 evaluation, telemetry MVP |
+| In progress | Measured camera calibration, refreshed RViz recording with selectable v1.1 strategies, MoveIt planning integration |
+| Planned | RGB-D metric mapping, verified SEW IK adapter, Gazebo collision demo, physical Franka re-validation |
 
 ## Author Contribution
 
 | Work | Contribution |
 |---|---|
 | HUMANS MOVE research prototype, Summer 2024 | Eric Raymond: perception experiments, ROS integration, teleoperation prototype, and research artifacts completed during the program |
-| Independent post-program portfolio engineering, 2026 | Eric Raymond: modular architecture, mapping/safety refactor, tests, benchmarks, documentation, CI, containers, Scholar simulation, and research-informed v1.1 retargeting/safety evaluation |
-| Third-party systems | MediaPipe by Google; MonoDepth2 by Niantic; ROS/MoveIt and Franka ecosystem packages by their maintainers |
-| Cited research (not collaborators) | SEW-Mimic; CBF humanoid imitation; AnyTeleop; vision shared-control teleop — see [`docs/research/related-work.md`](docs/research/related-work.md) |
+| Independent portfolio engineering, 2026 | Eric Raymond: modular architecture, safety/mapping refactor, tests, benchmarks, containers, CI, runbooks, telemetry, simulation evidence, and documentation |
+| Third-party systems | MediaPipe, MonoDepth2, ROS/MoveIt, Franka ecosystem packages, OSQP, SciPy, and Supabase/PostgreSQL remain their maintainers' work |
 
-## Citation
+## Citation and License
 
-Initial prototype work was completed in the **HUMANS MOVE Program, University of Wyoming**. Post-program portfolio engineering is independent. Cite the project with [`CITATION.cff`](CITATION.cff) / [`docs/references.bib`](docs/references.bib). Also cite [MonoDepth2](https://github.com/nianticlabs/monodepth2), [MediaPipe](https://github.com/google/mediapipe), [ROS](https://www.ros.org/), [MoveIt](https://moveit.ros.org/), and [Franka Robotics](https://franka.de/) when their components are used.
-
-## License
-
-Code authored for this repository is released under the [MIT License](LICENSE). Third-party models, datasets, packages, and pretrained weights retain their own licenses and are not redistributed here.
+Initial prototype work was completed in the **HUMANS MOVE Program, University of Wyoming**. Post-program portfolio engineering is independent. See [`CITATION.cff`](CITATION.cff), [`docs/references.bib`](docs/references.bib), and the [MIT License](LICENSE).

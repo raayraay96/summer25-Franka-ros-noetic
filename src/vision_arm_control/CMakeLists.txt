@@ -36,6 +36,7 @@ catkin_install_python(PROGRAMS
   scripts/depth_estimator_node.py
   scripts/human_to_robot_mapper_node.py
   scripts/safety_monitor_node.py
+  scripts/telemetry_node.py
   scripts/robot_controller_node.py
   scripts/mock_landmark_publisher.py
   scripts/legacy/main.py
