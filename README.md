@@ -13,7 +13,7 @@
 
 The system maps webcam or mock human wrist landmarks to Franka Panda end-effector targets, rejects unsafe commands before the controller boundary, and defaults to dry-run or simulation behavior. The verified public evidence uses synthetic inputs and RViz 2 fake hardware. It is not physical-robot validation or safety certification.
 
-Developed initially during the **HUMANS MOVE Program at the University of Wyoming**. After the program concluded, Eric Raymond independently refactored the prototype into the portfolio system documented here.
+Developed initially during the **HUMANS MOVE Program at the University of Wyoming**. After the program concluded, Eric Raymond independently refactored the prototype into the portfolio system documented here. The completed [portfolio readiness audit](docs/portfolio-audit.md) records the verification performed, the remediation applied, and the remaining physical-deployment boundaries.
 
 ## Engineering Highlights
 

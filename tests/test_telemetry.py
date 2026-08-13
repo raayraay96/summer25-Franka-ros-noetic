@@ -6,6 +6,8 @@ import sys
 import time
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src" / "vision_arm_control" / "src"))
 
@@ -56,3 +58,18 @@ def test_submit_never_blocks_when_queue_is_full():
     assert client.submit(event)
     assert not client.submit(event)
     assert client.dropped_events == 1
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"queue_size": 0.5},
+        {"batch_size": 0.5},
+        {"flush_interval_sec": 0},
+        {"flush_interval_sec": float("nan")},
+        {"max_retries": -1},
+    ],
+)
+def test_client_rejects_invalid_writer_parameters(kwargs):
+    with pytest.raises(ValueError):
+        AsyncTelemetryClient(RecordingSink(), **kwargs)

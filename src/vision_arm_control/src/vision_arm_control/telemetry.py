@@ -10,6 +10,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 import json
 import logging
+import math
 from queue import Empty, Full, Queue
 from threading import Event, Thread
 import time
@@ -97,13 +98,21 @@ class AsyncTelemetryClient:
         flush_interval_sec: float = 1.0,
         max_retries: int = 2,
     ):
+        queue_size = int(queue_size)
+        batch_size = int(batch_size)
+        flush_interval_sec = float(flush_interval_sec)
+        max_retries = int(max_retries)
         if queue_size <= 0 or batch_size <= 0:
-            raise ValueError("queue_size and batch_size must be positive")
+            raise ValueError("queue_size and batch_size must be positive integers")
+        if not math.isfinite(flush_interval_sec) or flush_interval_sec <= 0:
+            raise ValueError("flush_interval_sec must be a positive finite number")
+        if max_retries < 0:
+            raise ValueError("max_retries must be non-negative")
         self.sink = sink
-        self.batch_size = int(batch_size)
-        self.flush_interval_sec = float(flush_interval_sec)
-        self.max_retries = int(max_retries)
-        self._queue = Queue(maxsize=int(queue_size))
+        self.batch_size = batch_size
+        self.flush_interval_sec = flush_interval_sec
+        self.max_retries = max_retries
+        self._queue = Queue(maxsize=queue_size)
         self._stop = Event()
         self._thread = Thread(target=self._worker, name="telemetry-writer", daemon=True)
         self._started = False
