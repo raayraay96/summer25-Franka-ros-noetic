@@ -2,6 +2,7 @@
 """Safety monitor: gate target poses before controller execution."""
 from __future__ import annotations
 
+import copy
 import json
 import time
 
@@ -82,7 +83,7 @@ class SafetyMonitorNode:
     def _cb(self, msg: PoseStamped) -> None:
         started = time.perf_counter()
         now = rospy.Time.now().to_sec()
-        self.monitor.note_pose(now)
+        self.monitor.note_pose(msg.header.stamp.to_sec())
         pos = [msg.pose.position.x, msg.pose.position.y, msg.pose.position.z]
         decision = self.monitor.evaluate_position(pos, now)
         latency_ms = (time.perf_counter() - started) * 1000.0
@@ -103,9 +104,8 @@ class SafetyMonitorNode:
         if not decision.accepted or decision.position is None:
             return
         out = PoseStamped()
-        out.header = msg.header
-        out.header.stamp = rospy.Time.now()
-        out.pose = msg.pose
+        out.header = copy.deepcopy(msg.header)
+        out.pose = copy.deepcopy(msg.pose)
         out.pose.position.x = float(decision.position[0])
         out.pose.position.y = float(decision.position[1])
         out.pose.position.z = float(decision.position[2])

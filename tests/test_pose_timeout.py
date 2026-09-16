@@ -59,3 +59,10 @@ def test_command_staleness_exact_boundary():
     c.note_command(1.0)
     assert not c.is_stale(1.2)
     assert c.is_stale(1.2000001)
+
+
+@pytest.mark.parametrize("stamp,now", [(2.0, 1.0), (float("inf"), 1.0), (1.0, float("nan"))])
+def test_invalid_clock_or_future_pose_rejected(stamp, now):
+    m = PoseTimeoutMonitor(timeout_sec=0.5)
+    m.note_pose(stamp)
+    assert not m.is_valid(now)

@@ -22,7 +22,7 @@ Install Docker Desktop or Docker Engine. The pure-Python gate still works with:
 
 ```bash
 python3 -m pip install -r requirements-ci.txt
-make ci
+make check
 ```
 
 ### `rospack find vision_arm_control` fails
@@ -35,9 +35,9 @@ source /ws/devel/setup.bash
 rospack find vision_arm_control
 ```
 
-### Simulation exits after about 15 seconds
+### Simulation times out or exits early
 
-That is expected in `scripts/ci_smoke_noetic.sh`; `timeout` bounds the smoke test. Any exit code other than `0` or `124` is treated as a failure.
+The local smoke gate requires three messages on `/robot_controller_node/executed_pose` within 30 seconds. Timeout is a failure, even if roslaunch remained alive. The script prints launch and topic logs on failure and stops its launch on exit. Use an isolated ROS master; an existing master is rejected to prevent unrelated nodes from satisfying the gate.
 
 ### Model weights are missing
 
@@ -62,4 +62,4 @@ A growing `dropped_events` heartbeat value means the network sink is slower than
 
 ### Full validation is too slow for every edit
 
-Use `make ci` during development. Run `make full-validation` before publishing new benchmark claims or replacing committed evidence.
+Use `make check` during development. Run `make full-validation` before publishing new benchmark claims or replacing committed evidence.

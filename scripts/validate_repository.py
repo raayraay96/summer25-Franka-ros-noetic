@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import subprocess
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -55,14 +56,19 @@ for required in [
 assert (ROOT / "Dockerfile").read_text() == (
     ROOT / "Dockerfile.noetic"
 ).read_text(), "Dockerfile and Dockerfile.noetic must stay identical"
-for path in ROOT.rglob("*"):
-    if not path.is_file() or ".git" in path.parts:
-        continue
+# Honor Git ignores: local virtualenvs and generated outputs are not source.
+paths = (
+    subprocess.check_output(["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"], cwd=ROOT)
+    .decode()
+    .split("\0")
+)
+source_files = [ROOT / name for name in paths if name and (ROOT / name).is_file()]
+for path in source_files:
     assert path.stat().st_size <= 10 * 1024 * 1024, f"file exceeds 10 MiB: {path}"
     if path.suffix.lower() in {".pt", ".pth", ".bag", ".onnx"}:
         raise AssertionError(f"forbidden binary in working tree: {path}")
 placeholder = "your" + "username"
-for path in ROOT.rglob("*"):
+for path in source_files:
     if path.is_file() and path.suffix.lower() not in {
         ".gif",
         ".mp4",

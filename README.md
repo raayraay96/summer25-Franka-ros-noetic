@@ -2,7 +2,6 @@
 
 [![ROS Noetic](https://img.shields.io/badge/ROS-Noetic-22314E?logo=ros)](https://wiki.ros.org/noetic)
 [![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white)](requirements.txt)
-[![CI](https://github.com/raayraay96/summer25-Franka-ros-noetic/actions/workflows/ci.yml/badge.svg)](https://github.com/raayraay96/summer25-Franka-ros-noetic/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **A research teleoperation prototype hardened into a reproducible, safety-gated, testable Linux/ROS system with automated validation and optional asynchronous Postgres telemetry.**
@@ -20,7 +19,7 @@ Developed initially during the **HUMANS MOVE Program at the University of Wyomin
 - Reproducible ROS Noetic environment through Docker, Compose, pinned Python dependencies, and simple `make` commands
 - Modular perception, mapping, safety, controller, mock-input, and telemetry boundaries
 - Dry-run defaults, workspace gating, pose timeouts, E-stop handling, dead-man hooks, and explicit real-robot opt-in
-- Pure-Python unit/property tests plus containerized catkin and launch smoke tests in GitHub Actions
+- Pure-Python unit/property tests plus locally run containerized catkin and launch smoke tests
 - Trusted-oracle QP cross-validation, paired simulation benchmarks, fault injection, and committed evidence
 - Non-blocking telemetry queue for safety decisions, timeouts, E-stop events, latency, and node heartbeat data
 - Runbooks, claims ledger, evidence provenance, calibration status, and visible limitations
@@ -40,8 +39,10 @@ make sim
 ### Local quality gate without ROS
 
 ```bash
+python3.10 -m venv .venv
+source .venv/bin/activate
 make install
-make ci
+make check
 ```
 
 Useful commands:
@@ -50,7 +51,7 @@ Useful commands:
 make help             # list supported workflows
 make test             # pure-Python tests
 make lint             # Black + Flake8
-make qp-smoke         # CI-sized trusted-oracle check
+make qp-smoke         # 800-case trusted-oracle check
 make full-validation  # 6,000 QPs + 30-replicate benchmark
 make sim-compose      # same simulation path through Compose
 ```
@@ -62,7 +63,7 @@ Model weights stay outside Git. See [`docs/model-setup.md`](docs/model-setup.md)
 - A fragile research prototype can be converted into an understandable, reproducible system.
 - Safety-critical decisions can be isolated behind explicit interfaces and conservative defaults.
 - Numerical and simulation claims can be tied to automated tests, artifacts, and reproducible commands.
-- Linux/ROS workloads can be containerized and validated through CI without hiding environment limitations.
+- Linux/ROS workloads can be containerized and validated locally without hiding environment limitations.
 - Operational metrics can leave the control path through a bounded asynchronous queue and land in PostgreSQL.
 
 ## Architecture
@@ -122,7 +123,7 @@ make benchmark-full
 python scripts/validate_config.py
 ```
 
-The pull-request workflow runs an 800-case QP subset and benchmark smoke path. The manually triggered [`full-validation.yml`](.github/workflows/full-validation.yml) runs the full evidence commands and uploads artifacts.
+`make check` runs the unit tests, ROS 2 pure-logic tests, formatting/config checks, an 800-case QP subset, and benchmark smoke path locally. `make full-validation` runs the full evidence commands. GitHub Actions is not used; see the [local validation guide](docs/local-validation.md).
 
 ### Additional measured results
 
@@ -200,7 +201,7 @@ The preserved initial audit is in [`docs/repository-audit.md`](docs/repository-a
 
 | State | Work |
 |---|---|
-| Implemented | Modular ROS1 nodes, tests, pinned environment, Docker, CI, safety gates, ROS 2 RViz evidence, v1.1 evaluation, telemetry MVP |
+| Implemented | Modular ROS1 nodes, tests, pinned environment, Docker, local validation, safety gates, ROS 2 RViz evidence, v1.1 evaluation, telemetry MVP |
 | In progress | Measured camera calibration, refreshed RViz recording with selectable v1.1 strategies, MoveIt planning integration |
 | Planned | RGB-D metric mapping, verified SEW IK adapter, Gazebo collision demo, physical Franka re-validation |
 

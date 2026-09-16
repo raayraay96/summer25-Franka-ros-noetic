@@ -27,13 +27,13 @@
     <include file="$(find panda_moveit_config)/launch/demo.launch"/>
   </group>
 
-  <node pkg="vision_arm_control" type="mock_landmark_publisher.py" name="mock_landmark_publisher" output="screen" if="$(arg use_mock_landmarks)"/>
+  <node pkg="vision_arm_control" type="mock_landmark_publisher.py" name="mock_landmark_publisher" output="screen" required="true" if="$(arg use_mock_landmarks)"/>
 
-  <node pkg="vision_arm_control" type="human_to_robot_mapper_node.py" name="human_to_robot_mapper_node" output="screen">
+  <node pkg="vision_arm_control" type="human_to_robot_mapper_node.py" name="human_to_robot_mapper_node" output="screen" required="true">
     <param name="mapping_mode" value="shoulder_relative"/>
   </node>
 
-  <node pkg="vision_arm_control" type="safety_monitor_node.py" name="safety_monitor_node" output="screen">
+  <node pkg="vision_arm_control" type="safety_monitor_node.py" name="safety_monitor_node" output="screen" required="true">
     <param name="control_mode" value="simulation"/>
     <param name="allow_real_robot" value="false"/>
     <param name="require_deadman" value="false"/>
@@ -47,7 +47,7 @@
     </node>
   </group>
 
-  <node pkg="vision_arm_control" type="robot_controller_node.py" name="robot_controller_node" output="screen">
+  <node pkg="vision_arm_control" type="robot_controller_node.py" name="robot_controller_node" output="screen" required="true">
     <param name="mode" value="simulation"/>
     <param name="use_robot" value="false"/>
     <param name="allow_real_robot" value="false"/>

@@ -90,3 +90,6 @@ FRANKA_MODEL_DIR
 
 # Transient CI output (uploaded as artifact, never committed)
 results/v1.1-ci/
+
+# Local validation evidence (regenerated with make check)
+results/v1.1-local/

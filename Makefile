@@ -4,8 +4,9 @@ SHELL := /usr/bin/env bash
 PYTHON ?= python3
 IMAGE ?= franka-teleop:noetic
 CI_RESULTS ?= results/v1.1-local
+ROS_CHECK_SCRIPTS := src/vision_arm_control/scripts/human_to_robot_mapper_node.py src/vision_arm_control/scripts/safety_monitor_node.py
 
-.PHONY: help install test lint validate ci docker-build sim sim-compose qp-smoke qp-audit benchmark-smoke benchmark-full full-validation telemetry-test clean
+.PHONY: check ros2-test help install test lint validate ci docker-build sim sim-compose qp-smoke qp-audit benchmark-smoke benchmark-full full-validation telemetry-test clean
 
 help: ## Show the available developer commands
 	@awk 'BEGIN {FS = ":.*## "; printf "Usage: make <target>\n\nTargets:\n"} /^[a-zA-Z0-9_-]+:.*## / {printf "  %-20s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -20,14 +21,14 @@ telemetry-test: ## Run only telemetry queue and serialization tests
 	$(PYTHON) -m pytest -q tests/test_telemetry.py
 
 lint: ## Check formatting and static style
-	$(PYTHON) -m black --check src/vision_arm_control/src tests benchmarks scripts ros2_ws/src/franka_teleop_ros2
-	$(PYTHON) -m flake8 src/vision_arm_control/src tests benchmarks scripts ros2_ws/src/franka_teleop_ros2
+	$(PYTHON) -m black --check src/vision_arm_control/src tests benchmarks scripts ros2_ws/src/franka_teleop_ros2 $(ROS_CHECK_SCRIPTS)
+	$(PYTHON) -m flake8 src/vision_arm_control/src tests benchmarks scripts ros2_ws/src/franka_teleop_ros2 $(ROS_CHECK_SCRIPTS)
 
 validate: ## Validate configs, docs, launch XML, and repository hygiene
 	$(PYTHON) scripts/validate_repository.py
 	$(PYTHON) scripts/validate_config.py
 
-qp-smoke: ## Run the CI-sized QP oracle cross-validation
+qp-smoke: ## Run the 800-case QP oracle cross-validation
 	mkdir -p $(CI_RESULTS)
 	$(PYTHON) scripts/qp_cross_validation.py --generic 400 --cbf 400 --output $(CI_RESULTS)/qp-smoke.json
 
@@ -50,7 +51,12 @@ sim: docker-build ## Run the headless ROS Noetic simulation smoke path
 sim-compose: ## Run the same simulation path through Docker Compose
 	docker compose run --rm noetic-sim
 
-ci: lint test validate qp-smoke benchmark-smoke ## Reproduce the pull-request quality gate locally
+ros2-test: ## Run ROS 2 pure-Python mapping and motion tests
+	$(PYTHON) -m pytest -q ros2_ws/src/franka_teleop_ros2/test/
+
+check: lint test ros2-test validate qp-smoke benchmark-smoke ## Run the local quality gate (no GitHub Actions)
+
+ci: check ## Compatibility alias for make check
 
 full-validation: test validate qp-audit benchmark-full ## Run the full local validation evidence path
 

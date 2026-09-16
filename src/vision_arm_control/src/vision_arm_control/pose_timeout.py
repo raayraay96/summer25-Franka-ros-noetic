@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import Optional
 
@@ -29,7 +30,8 @@ class PoseTimeoutMonitor:
     def is_valid(self, now: float) -> bool:
         if not self._has_pose or self._last_pose_time is None:
             return False
-        return (float(now) - self._last_pose_time) <= self.timeout_sec
+        age = float(now) - self._last_pose_time
+        return math.isfinite(age) and 0.0 <= age <= self.timeout_sec
 
     def age(self, now: float) -> Optional[float]:
         if self._last_pose_time is None:

@@ -12,7 +12,6 @@ from __future__ import annotations
 import json
 import math
 
-import numpy as np
 import rospy
 import tf.transformations as tft
 from geometry_msgs.msg import PoseStamped
@@ -64,9 +63,7 @@ class HumanToRobotMapperNode:
         cam_rpy = list(rospy.get_param("~camera_in_base_rpy", [math.pi, 0.0, 0.0]))
         # T_base_camera: point_base = T * point_camera
         self.T_base_camera = _xyz_rpy_to_T(cam_xyz, cam_rpy)
-        rospy.logwarn_once(
-            "Camera extrinsics are EXAMPLE values unless calibration status is 'measured'."
-        )
+        rospy.logwarn_once("Camera extrinsics are EXAMPLE values unless calibration status is 'measured'.")
 
         ws = rospy.get_param(
             "~workspace",
@@ -108,11 +105,17 @@ class HumanToRobotMapperNode:
             return
         if float(wrist.get("confidence", wrist.get("visibility", 0.0))) < self.min_conf:
             return
-        self.pose_timeout.note_pose(now)
+        header = data.get("header") or {}
+        try:
+            stamp = float(header["stamp"])
+        except (KeyError, TypeError, ValueError):
+            self.reject_pub.publish(String(data="invalid_pose_timestamp"))
+            return
+        self.pose_timeout.note_pose(stamp)
         if not self.pose_timeout.is_valid(now):
+            self.reject_pub.publish(String(data="pose_timeout"))
             return
 
-        header = data.get("header") or {}
         width = int(header.get("image_width", self.intrinsics.width))
         height = int(header.get("image_height", self.intrinsics.height))
         wrist_xy = (float(wrist["x"]), float(wrist["y"]))
@@ -151,7 +154,7 @@ class HumanToRobotMapperNode:
         limited = self.vlim.update(filtered, dt)
 
         out = PoseStamped()
-        out.header.stamp = rospy.Time.now()
+        out.header.stamp = rospy.Time.from_sec(stamp)
         out.header.frame_id = self.base_frame
         out.pose.position.x = float(limited[0])
         out.pose.position.y = float(limited[1])
